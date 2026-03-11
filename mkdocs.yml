@@ -148,6 +148,8 @@ nav:
     - "08 - VQE (Variational Eigensolver)": tutorials/08-vqe.md
     - "09 - QAOA for MaxCut": tutorials/09-qaoa.md
     - "10 - Hybrid Algorithms": tutorials/10-hybrid-algorithms.md
+  - Examples:
+    - examples/index.md
   - Backend Guides:
     - backends/index.md
     - Local Simulator: backends/local-simulator.md

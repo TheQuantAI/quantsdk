@@ -206,7 +206,7 @@ Open a GitHub issue with:
 
 ## Security
 
-If you discover a security vulnerability, please **do not** open a public issue. Instead, see [SECURITY.md](SECURITY.md) for responsible disclosure instructions.
+If you discover a security vulnerability, please **do not** open a public issue. Instead, see [SECURITY.md](https://github.com/TheQuantAI/quantsdk/blob/main/SECURITY.md) for responsible disclosure instructions.
 
 ## Community
 
