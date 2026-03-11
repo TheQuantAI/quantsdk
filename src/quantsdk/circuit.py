@@ -11,7 +11,7 @@ or OpenQASM for execution on any backend.
 
 from __future__ import annotations
 
-from typing import Sequence
+from collections.abc import Sequence
 
 from quantsdk.gates import (
     Barrier,
@@ -353,12 +353,10 @@ class Circuit:
                         lines[q].append("●")
                     elif q == q1 and gate.name == "CX":
                         lines[q].append("X")
-                    elif q == q0 and gate.name == "CZ":
-                        lines[q].append("●")
-                    elif q == q1 and gate.name == "CZ":
+                    elif (q == q0 and gate.name == "CZ") or (q == q1 and gate.name == "CZ"):
                         lines[q].append("●")
                     elif gate.name == "SWAP" and q in gate.qubits:
-                        lines[q].append("×")
+                        lines[q].append("x")
                     elif min_q < q < max_q:
                         lines[q].append("|")
                     else:

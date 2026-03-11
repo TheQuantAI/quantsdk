@@ -26,8 +26,8 @@ from quantsdk.result import Result
 from quantsdk.runner import run
 
 __all__ = [
-    "__version__",
     "Circuit",
     "Result",
+    "__version__",
     "run",
 ]

@@ -16,7 +16,6 @@ from quantsdk.circuit import Circuit
 from quantsdk.result import Result
 from quantsdk.simulators.local import LocalSimulator
 
-
 # Default backend instance (lazy singleton)
 _default_simulator: LocalSimulator | None = None
 

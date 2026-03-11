@@ -11,8 +11,8 @@ Each gate stores its name, target qubits, control qubits, and parameters.
 from __future__ import annotations
 
 import math
+from collections.abc import Sequence
 from dataclasses import dataclass, field
-from typing import Sequence
 
 import numpy as np
 
@@ -41,7 +41,7 @@ class Gate:
         """Return the unitary matrix representation of this gate.
 
         Returns:
-            A 2^n × 2^n complex numpy array representing the gate unitary.
+            A 2^n x 2^n complex numpy array representing the gate unitary.
 
         Raises:
             NotImplementedError: If matrix is not defined for this gate.

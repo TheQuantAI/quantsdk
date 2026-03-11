@@ -11,7 +11,6 @@ on a standard machine.
 
 from __future__ import annotations
 
-import math
 import uuid
 from collections import Counter
 from typing import Any
@@ -80,7 +79,7 @@ class LocalSimulator(Backend):
                 f"Use a GPU simulator or cloud backend for larger circuits."
             )
 
-        seed = options.get("seed", None)
+        seed = options.get("seed")
         rng = np.random.default_rng(seed)
 
         # Initialize |00...0⟩ state
@@ -135,7 +134,7 @@ class LocalSimulator(Backend):
     def _apply_gate(self, statevector: np.ndarray, gate: Gate, n: int) -> np.ndarray:
         """Apply a gate to the statevector.
 
-        Constructs the full 2^n × 2^n unitary by tensoring the gate matrix
+        Constructs the full 2^n x 2^n unitary by tensoring the gate matrix
         with identity matrices, then applies it to the statevector.
         """
         gate_matrix = gate.matrix()
