@@ -91,7 +91,7 @@ class IBMBackend(Backend):
         token: str | None = None,
         instance: str = "ibm-q/open/main",
         backend_name: str | None = None,
-        channel: str = "ibm_quantum",
+        channel: str = "ibm_quantum_platform",
     ) -> None:
         _check_ibm_deps()
         from qiskit_ibm_runtime import QiskitRuntimeService

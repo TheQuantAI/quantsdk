@@ -141,19 +141,19 @@ class TestRunAPI:
         assert result.counts == {"1": 100}
 
     def test_run_unknown_backend_raises(self):
-        """Requesting an unavailable backend should raise NotImplementedError."""
+        """Requesting an unavailable backend should raise ValueError."""
         c = qs.Circuit(1)
         c.h(0).measure_all()
 
-        with pytest.raises(NotImplementedError, match="not available"):
-            qs.run(c, backend="ibm_brisbane")
+        with pytest.raises(ValueError, match="Unknown backend"):
+            qs.run(c, backend="fake_nonexistent_backend")
 
     def test_run_smart_routing_raises(self):
         """optimize_for should raise NotImplementedError in v0.1."""
         c = qs.Circuit(1)
         c.h(0).measure_all()
 
-        with pytest.raises(NotImplementedError, match="TheQuantCloud"):
+        with pytest.raises(NotImplementedError, match="QuantRouter"):
             qs.run(c, optimize_for="quality")
 
 

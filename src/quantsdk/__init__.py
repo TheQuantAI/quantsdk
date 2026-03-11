@@ -31,3 +31,13 @@ __all__ = [
     "__version__",
     "run",
 ]
+
+# Lazy imports for optional modules — available as qs.interop, qs.backends
+def __getattr__(name: str):
+    if name == "interop":
+        from quantsdk import interop
+        return interop
+    if name == "backends":
+        from quantsdk import backends
+        return backends
+    raise AttributeError(f"module 'quantsdk' has no attribute {name!r}")

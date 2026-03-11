@@ -126,6 +126,106 @@ class Result:
             "metadata": self.metadata,
         }
 
+    def to_pandas(self) -> Any:
+        """Export result as a pandas DataFrame.
+
+        Requires: ``pip install pandas``
+
+        Returns:
+            A ``pandas.DataFrame`` with columns: bitstring, count, probability.
+
+        Example::
+
+            result = qs.run(circuit, shots=1000)
+            df = result.to_pandas()
+            print(df.head())
+        """
+        try:
+            import pandas as pd
+        except ImportError as e:
+            raise ImportError(
+                "pandas is required for to_pandas(). "
+                "Install it with: pip install pandas"
+            ) from e
+
+        rows = [
+            {"bitstring": bs, "count": c, "probability": c / self.shots}
+            for bs, c in sorted(self.counts.items(), key=lambda x: x[1], reverse=True)
+        ]
+        return pd.DataFrame(rows)
+
+    # ─── Visualization ───
+
+    def plot_histogram(
+        self,
+        *,
+        top_k: int | None = None,
+        title: str | None = None,
+        figsize: tuple[float, float] = (10, 5),
+        color: str = "#4C72B0",
+        show: bool = True,
+    ) -> Any:
+        """Plot a histogram of measurement results.
+
+        Requires: ``pip install matplotlib``
+
+        Args:
+            top_k: Show only the top-k most frequent outcomes. Default: all.
+            title: Plot title. Default: "Measurement Results ({shots} shots)".
+            figsize: Figure size as (width, height) in inches.
+            color: Bar color (any matplotlib color string).
+            show: Whether to call ``plt.show()``. Set False for programmatic use.
+
+        Returns:
+            A ``matplotlib.figure.Figure`` object.
+
+        Example::
+
+            result = qs.run(circuit, shots=1000)
+            result.plot_histogram(top_k=10, title="Bell State")
+        """
+        try:
+            import matplotlib.pyplot as plt
+        except ImportError as e:
+            raise ImportError(
+                "matplotlib is required for plot_histogram(). "
+                "Install it with: pip install quantsdk[viz]"
+            ) from e
+
+        # Sort by count descending
+        sorted_items = sorted(self.counts.items(), key=lambda x: x[1], reverse=True)
+        if top_k is not None:
+            sorted_items = sorted_items[:top_k]
+
+        bitstrings = [bs for bs, _ in sorted_items]
+        counts = [c for _, c in sorted_items]
+        probs = [c / self.shots for c in counts]
+
+        fig, ax = plt.subplots(figsize=figsize)
+        bars = ax.bar(range(len(bitstrings)), probs, color=color, edgecolor="white")
+        ax.set_xticks(range(len(bitstrings)))
+        ax.set_xticklabels(bitstrings, rotation=45 if len(bitstrings) > 8 else 0, ha="right")
+        ax.set_xlabel("Measurement Outcome")
+        ax.set_ylabel("Probability")
+        ax.set_title(title or f"Measurement Results ({self.shots:,} shots)")
+        ax.set_ylim(0, max(probs) * 1.15 if probs else 1.0)
+
+        # Add count labels on bars
+        for bar, count, _prob in zip(bars, counts, probs, strict=True):
+            ax.text(
+                bar.get_x() + bar.get_width() / 2,
+                bar.get_height(),
+                f"{count}",
+                ha="center",
+                va="bottom",
+                fontsize=8,
+            )
+
+        fig.tight_layout()
+        if show:
+            plt.show()
+        return fig
+
     # ─── Display ───
 
     def summary(self) -> str:

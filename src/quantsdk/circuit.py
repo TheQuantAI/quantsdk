@@ -12,6 +12,7 @@ or OpenQASM for execution on any backend.
 from __future__ import annotations
 
 from collections.abc import Sequence
+from typing import Any
 
 from quantsdk.gates import (
     Barrier,
@@ -288,6 +289,70 @@ class Circuit:
         new_circuit = Circuit(self._num_qubits, name=self._name)
         new_circuit._gates = list(self._gates)  # Gates are frozen dataclasses
         return new_circuit
+
+    # ─── Framework Interop (convenience methods) ───
+
+    def to_qiskit(self) -> Any:
+        """Convert this circuit to a Qiskit QuantumCircuit.
+
+        Requires: ``pip install quantsdk[ibm]``
+
+        Returns:
+            A ``qiskit.circuit.QuantumCircuit`` equivalent.
+
+        Example::
+
+            circuit = qs.Circuit(2).h(0).cx(0, 1).measure_all()
+            qiskit_circuit = circuit.to_qiskit()
+        """
+        from quantsdk.interop.qiskit_interop import to_qiskit
+
+        return to_qiskit(self)
+
+    def to_openqasm(self) -> str:
+        """Export this circuit as an OpenQASM 2.0 string.
+
+        Returns:
+            An OpenQASM 2.0 compliant string.
+
+        Example::
+
+            circuit = qs.Circuit(2).h(0).cx(0, 1).measure_all()
+            print(circuit.to_openqasm())
+        """
+        from quantsdk.interop.openqasm import to_openqasm
+
+        return to_openqasm(self)
+
+    @classmethod
+    def from_qiskit(cls, qiskit_circuit: Any) -> Circuit:
+        """Create a QuantSDK Circuit from a Qiskit QuantumCircuit.
+
+        Requires: ``pip install quantsdk[ibm]``
+
+        Args:
+            qiskit_circuit: A ``qiskit.circuit.QuantumCircuit``.
+
+        Returns:
+            A QuantSDK Circuit equivalent.
+        """
+        from quantsdk.interop.qiskit_interop import from_qiskit
+
+        return from_qiskit(qiskit_circuit)
+
+    @classmethod
+    def from_openqasm(cls, qasm_str: str) -> Circuit:
+        """Create a QuantSDK Circuit from an OpenQASM 2.0 string.
+
+        Args:
+            qasm_str: An OpenQASM 2.0 compliant string.
+
+        Returns:
+            A QuantSDK Circuit.
+        """
+        from quantsdk.interop.openqasm import from_openqasm
+
+        return from_openqasm(qasm_str)
 
     # ─── Circuit Analysis ───
 
