@@ -140,6 +140,54 @@ class IGate(Gate):
         return np.eye(2, dtype=complex)
 
 
+class SdgGate(Gate):
+    """S-dagger (S†) gate -- adjoint of S."""
+
+    def __init__(self, qubit: int) -> None:
+        object.__setattr__(self, "name", "Sdg")
+        object.__setattr__(self, "qubits", (qubit,))
+        object.__setattr__(self, "params", ())
+
+    def matrix(self) -> np.ndarray:
+        return np.array([[1, 0], [0, -1j]], dtype=complex)
+
+
+class TdgGate(Gate):
+    """T-dagger (T†) gate -- adjoint of T."""
+
+    def __init__(self, qubit: int) -> None:
+        object.__setattr__(self, "name", "Tdg")
+        object.__setattr__(self, "qubits", (qubit,))
+        object.__setattr__(self, "params", ())
+
+    def matrix(self) -> np.ndarray:
+        return np.array([[1, 0], [0, np.exp(-1j * math.pi / 4)]], dtype=complex)
+
+
+class SXGate(Gate):
+    """Square root of X gate."""
+
+    def __init__(self, qubit: int) -> None:
+        object.__setattr__(self, "name", "SX")
+        object.__setattr__(self, "qubits", (qubit,))
+        object.__setattr__(self, "params", ())
+
+    def matrix(self) -> np.ndarray:
+        return 0.5 * np.array([[1 + 1j, 1 - 1j], [1 - 1j, 1 + 1j]], dtype=complex)
+
+
+class SXdgGate(Gate):
+    """Square root of X dagger gate."""
+
+    def __init__(self, qubit: int) -> None:
+        object.__setattr__(self, "name", "SXdg")
+        object.__setattr__(self, "qubits", (qubit,))
+        object.__setattr__(self, "params", ())
+
+    def matrix(self) -> np.ndarray:
+        return 0.5 * np.array([[1 - 1j, 1 + 1j], [1 + 1j, 1 - 1j]], dtype=complex)
+
+
 # ─── Parametric Single-Qubit Gates ───
 
 
@@ -209,6 +257,72 @@ class U3Gate(Gate):
         )
 
 
+class PhaseGate(Gate):
+    """Phase gate P(lam) = diag(1, e^{i*lam})."""
+
+    def __init__(self, qubit: int, lam: float) -> None:
+        object.__setattr__(self, "name", "P")
+        object.__setattr__(self, "qubits", (qubit,))
+        object.__setattr__(self, "params", (lam,))
+
+    def matrix(self) -> np.ndarray:
+        lam = self.params[0]
+        return np.array([[1, 0], [0, np.exp(1j * lam)]], dtype=complex)
+
+
+class U1Gate(Gate):
+    """U1 gate -- equivalent to Phase gate. U1(lam) = diag(1, e^{i*lam})."""
+
+    def __init__(self, qubit: int, lam: float) -> None:
+        object.__setattr__(self, "name", "U1")
+        object.__setattr__(self, "qubits", (qubit,))
+        object.__setattr__(self, "params", (lam,))
+
+    def matrix(self) -> np.ndarray:
+        lam = self.params[0]
+        return np.array([[1, 0], [0, np.exp(1j * lam)]], dtype=complex)
+
+
+class U2Gate(Gate):
+    """U2 gate -- U2(phi, lam) = U3(pi/2, phi, lam)."""
+
+    def __init__(self, qubit: int, phi: float, lam: float) -> None:
+        object.__setattr__(self, "name", "U2")
+        object.__setattr__(self, "qubits", (qubit,))
+        object.__setattr__(self, "params", (phi, lam))
+
+    def matrix(self) -> np.ndarray:
+        phi, lam = self.params
+        return np.array(
+            [
+                [1, -np.exp(1j * lam)],
+                [np.exp(1j * phi), np.exp(1j * (phi + lam))],
+            ],
+            dtype=complex,
+        ) / math.sqrt(2)
+
+
+class RGate(Gate):
+    """General rotation gate R(theta, phi) on the Bloch sphere."""
+
+    def __init__(self, qubit: int, theta: float, phi: float) -> None:
+        object.__setattr__(self, "name", "R")
+        object.__setattr__(self, "qubits", (qubit,))
+        object.__setattr__(self, "params", (theta, phi))
+
+    def matrix(self) -> np.ndarray:
+        theta, phi = self.params
+        cos = math.cos(theta / 2)
+        sin = math.sin(theta / 2)
+        return np.array(
+            [
+                [cos, -1j * np.exp(-1j * phi) * sin],
+                [-1j * np.exp(1j * phi) * sin, cos],
+            ],
+            dtype=complex,
+        )
+
+
 # ─── Two-Qubit Gates ───
 
 
@@ -269,6 +383,323 @@ class RZZGate(Gate):
         return np.diag([diag, anti_diag, anti_diag, diag]).astype(complex)
 
 
+# ─── Controlled Gates ───
+
+
+class CYGate(Gate):
+    """Controlled-Y gate."""
+
+    def __init__(self, control: int, target: int) -> None:
+        object.__setattr__(self, "name", "CY")
+        object.__setattr__(self, "qubits", (control, target))
+        object.__setattr__(self, "params", ())
+
+    def matrix(self) -> np.ndarray:
+        return np.array(
+            [[1, 0, 0, 0], [0, 1, 0, 0], [0, 0, 0, -1j], [0, 0, 1j, 0]],
+            dtype=complex,
+        )
+
+
+class CHGate(Gate):
+    """Controlled-Hadamard gate."""
+
+    def __init__(self, control: int, target: int) -> None:
+        object.__setattr__(self, "name", "CH")
+        object.__setattr__(self, "qubits", (control, target))
+        object.__setattr__(self, "params", ())
+
+    def matrix(self) -> np.ndarray:
+        s = 1 / math.sqrt(2)
+        return np.array(
+            [[1, 0, 0, 0], [0, 1, 0, 0], [0, 0, s, s], [0, 0, s, -s]],
+            dtype=complex,
+        )
+
+
+class CSGate(Gate):
+    """Controlled-S gate."""
+
+    def __init__(self, control: int, target: int) -> None:
+        object.__setattr__(self, "name", "CS")
+        object.__setattr__(self, "qubits", (control, target))
+        object.__setattr__(self, "params", ())
+
+    def matrix(self) -> np.ndarray:
+        return np.diag([1, 1, 1, 1j]).astype(complex)
+
+
+class CSdgGate(Gate):
+    """Controlled-S-dagger gate."""
+
+    def __init__(self, control: int, target: int) -> None:
+        object.__setattr__(self, "name", "CSdg")
+        object.__setattr__(self, "qubits", (control, target))
+        object.__setattr__(self, "params", ())
+
+    def matrix(self) -> np.ndarray:
+        return np.diag([1, 1, 1, -1j]).astype(complex)
+
+
+class CRXGate(Gate):
+    """Controlled-RX gate."""
+
+    def __init__(self, control: int, target: int, theta: float) -> None:
+        object.__setattr__(self, "name", "CRX")
+        object.__setattr__(self, "qubits", (control, target))
+        object.__setattr__(self, "params", (theta,))
+
+    def matrix(self) -> np.ndarray:
+        theta = self.params[0]
+        cos = math.cos(theta / 2)
+        sin = math.sin(theta / 2)
+        return np.array(
+            [
+                [1, 0, 0, 0],
+                [0, 1, 0, 0],
+                [0, 0, cos, -1j * sin],
+                [0, 0, -1j * sin, cos],
+            ],
+            dtype=complex,
+        )
+
+
+class CRYGate(Gate):
+    """Controlled-RY gate."""
+
+    def __init__(self, control: int, target: int, theta: float) -> None:
+        object.__setattr__(self, "name", "CRY")
+        object.__setattr__(self, "qubits", (control, target))
+        object.__setattr__(self, "params", (theta,))
+
+    def matrix(self) -> np.ndarray:
+        theta = self.params[0]
+        cos = math.cos(theta / 2)
+        sin = math.sin(theta / 2)
+        return np.array(
+            [
+                [1, 0, 0, 0],
+                [0, 1, 0, 0],
+                [0, 0, cos, -sin],
+                [0, 0, sin, cos],
+            ],
+            dtype=complex,
+        )
+
+
+class CRZGate(Gate):
+    """Controlled-RZ gate."""
+
+    def __init__(self, control: int, target: int, theta: float) -> None:
+        object.__setattr__(self, "name", "CRZ")
+        object.__setattr__(self, "qubits", (control, target))
+        object.__setattr__(self, "params", (theta,))
+
+    def matrix(self) -> np.ndarray:
+        theta = self.params[0]
+        return np.array(
+            [
+                [1, 0, 0, 0],
+                [0, 1, 0, 0],
+                [0, 0, np.exp(-1j * theta / 2), 0],
+                [0, 0, 0, np.exp(1j * theta / 2)],
+            ],
+            dtype=complex,
+        )
+
+
+class CPhaseGate(Gate):
+    """Controlled-Phase gate. CP(lam) = diag(1, 1, 1, e^{i*lam})."""
+
+    def __init__(self, control: int, target: int, lam: float) -> None:
+        object.__setattr__(self, "name", "CP")
+        object.__setattr__(self, "qubits", (control, target))
+        object.__setattr__(self, "params", (lam,))
+
+    def matrix(self) -> np.ndarray:
+        lam = self.params[0]
+        return np.diag([1, 1, 1, np.exp(1j * lam)]).astype(complex)
+
+
+class CU1Gate(Gate):
+    """Controlled-U1 gate -- equivalent to CPhase."""
+
+    def __init__(self, control: int, target: int, lam: float) -> None:
+        object.__setattr__(self, "name", "CU1")
+        object.__setattr__(self, "qubits", (control, target))
+        object.__setattr__(self, "params", (lam,))
+
+    def matrix(self) -> np.ndarray:
+        lam = self.params[0]
+        return np.diag([1, 1, 1, np.exp(1j * lam)]).astype(complex)
+
+
+class CU3Gate(Gate):
+    """Controlled-U3 gate."""
+
+    def __init__(
+        self, control: int, target: int, theta: float, phi: float, lam: float
+    ) -> None:
+        object.__setattr__(self, "name", "CU3")
+        object.__setattr__(self, "qubits", (control, target))
+        object.__setattr__(self, "params", (theta, phi, lam))
+
+    def matrix(self) -> np.ndarray:
+        theta, phi, lam = self.params
+        cos = math.cos(theta / 2)
+        sin = math.sin(theta / 2)
+        return np.array(
+            [
+                [1, 0, 0, 0],
+                [0, 1, 0, 0],
+                [0, 0, cos, -np.exp(1j * lam) * sin],
+                [0, 0, np.exp(1j * phi) * sin, np.exp(1j * (phi + lam)) * cos],
+            ],
+            dtype=complex,
+        )
+
+
+class CSXGate(Gate):
+    """Controlled-SX gate."""
+
+    def __init__(self, control: int, target: int) -> None:
+        object.__setattr__(self, "name", "CSX")
+        object.__setattr__(self, "qubits", (control, target))
+        object.__setattr__(self, "params", ())
+
+    def matrix(self) -> np.ndarray:
+        return np.array(
+            [
+                [1, 0, 0, 0],
+                [0, 1, 0, 0],
+                [0, 0, (1 + 1j) / 2, (1 - 1j) / 2],
+                [0, 0, (1 - 1j) / 2, (1 + 1j) / 2],
+            ],
+            dtype=complex,
+        )
+
+
+# ─── Parametric Two-Qubit Rotation Gates ───
+
+
+class RXXGate(Gate):
+    """XX-rotation gate RXX(theta) = exp(-i * theta/2 * X⊗X)."""
+
+    def __init__(self, qubit1: int, qubit2: int, theta: float) -> None:
+        object.__setattr__(self, "name", "RXX")
+        object.__setattr__(self, "qubits", (qubit1, qubit2))
+        object.__setattr__(self, "params", (theta,))
+
+    def matrix(self) -> np.ndarray:
+        theta = self.params[0]
+        cos = math.cos(theta / 2)
+        sin = math.sin(theta / 2)
+        return np.array(
+            [
+                [cos, 0, 0, -1j * sin],
+                [0, cos, -1j * sin, 0],
+                [0, -1j * sin, cos, 0],
+                [-1j * sin, 0, 0, cos],
+            ],
+            dtype=complex,
+        )
+
+
+class RYYGate(Gate):
+    """YY-rotation gate RYY(theta) = exp(-i * theta/2 * Y⊗Y)."""
+
+    def __init__(self, qubit1: int, qubit2: int, theta: float) -> None:
+        object.__setattr__(self, "name", "RYY")
+        object.__setattr__(self, "qubits", (qubit1, qubit2))
+        object.__setattr__(self, "params", (theta,))
+
+    def matrix(self) -> np.ndarray:
+        theta = self.params[0]
+        cos = math.cos(theta / 2)
+        sin = math.sin(theta / 2)
+        return np.array(
+            [
+                [cos, 0, 0, 1j * sin],
+                [0, cos, -1j * sin, 0],
+                [0, -1j * sin, cos, 0],
+                [1j * sin, 0, 0, cos],
+            ],
+            dtype=complex,
+        )
+
+
+class RZXGate(Gate):
+    """ZX-rotation gate RZX(theta) = exp(-i * theta/2 * Z⊗X)."""
+
+    def __init__(self, qubit1: int, qubit2: int, theta: float) -> None:
+        object.__setattr__(self, "name", "RZX")
+        object.__setattr__(self, "qubits", (qubit1, qubit2))
+        object.__setattr__(self, "params", (theta,))
+
+    def matrix(self) -> np.ndarray:
+        theta = self.params[0]
+        cos = math.cos(theta / 2)
+        sin = math.sin(theta / 2)
+        return np.array(
+            [
+                [cos, -1j * sin, 0, 0],
+                [-1j * sin, cos, 0, 0],
+                [0, 0, cos, 1j * sin],
+                [0, 0, 1j * sin, cos],
+            ],
+            dtype=complex,
+        )
+
+
+# ─── Two-Qubit Special Gates ───
+
+
+class iSwapGate(Gate):  # noqa: N801
+    """iSWAP gate."""
+
+    def __init__(self, qubit1: int, qubit2: int) -> None:
+        object.__setattr__(self, "name", "iSWAP")
+        object.__setattr__(self, "qubits", (qubit1, qubit2))
+        object.__setattr__(self, "params", ())
+
+    def matrix(self) -> np.ndarray:
+        return np.array(
+            [[1, 0, 0, 0], [0, 0, 1j, 0], [0, 1j, 0, 0], [0, 0, 0, 1]],
+            dtype=complex,
+        )
+
+
+class DCXGate(Gate):
+    """Double-CX gate -- CX(0,1) followed by CX(1,0)."""
+
+    def __init__(self, qubit1: int, qubit2: int) -> None:
+        object.__setattr__(self, "name", "DCX")
+        object.__setattr__(self, "qubits", (qubit1, qubit2))
+        object.__setattr__(self, "params", ())
+
+    def matrix(self) -> np.ndarray:
+        return np.array(
+            [[1, 0, 0, 0], [0, 0, 0, 1], [0, 1, 0, 0], [0, 0, 1, 0]],
+            dtype=complex,
+        )
+
+
+class ECRGate(Gate):
+    """Echoed Cross-Resonance gate."""
+
+    def __init__(self, qubit1: int, qubit2: int) -> None:
+        object.__setattr__(self, "name", "ECR")
+        object.__setattr__(self, "qubits", (qubit1, qubit2))
+        object.__setattr__(self, "params", ())
+
+    def matrix(self) -> np.ndarray:
+        s = 1 / math.sqrt(2)
+        return s * np.array(
+            [[0, 1, 0, 1j], [1, 0, -1j, 0], [0, 1j, 0, 1], [-1j, 0, 1, 0]],
+            dtype=complex,
+        )
+
+
 # ─── Three-Qubit Gates ───
 
 
@@ -306,6 +737,20 @@ class FredkinGate(Gate):
         return m
 
 
+class CCZGate(Gate):
+    """Double-controlled Z (CCZ) gate."""
+
+    def __init__(self, control1: int, control2: int, target: int) -> None:
+        object.__setattr__(self, "name", "CCZ")
+        object.__setattr__(self, "qubits", (control1, control2, target))
+        object.__setattr__(self, "params", ())
+
+    def matrix(self) -> np.ndarray:
+        m = np.eye(8, dtype=complex)
+        m[7, 7] = -1
+        return m
+
+
 # ─── Special Gates ───
 
 
@@ -334,29 +779,80 @@ class Barrier(Gate):
     def matrix(self) -> np.ndarray:
         raise NotImplementedError("Barrier is not a unitary operation")
 
+class Reset(Gate):
+    """Reset gate -- resets a qubit to the |0> state."""
+
+    def __init__(self, qubit: int) -> None:
+        object.__setattr__(self, "name", "RESET")
+        object.__setattr__(self, "qubits", (qubit,))
+        object.__setattr__(self, "params", ())
+
+    def matrix(self) -> np.ndarray:
+        raise NotImplementedError("Reset is not a unitary operation")
 
 # ─── Gate Registry ───
 
 GATE_MAP: dict[str, type[Gate]] = {
+    # Single-qubit gates
     "h": HGate,
     "x": XGate,
     "y": YGate,
     "z": ZGate,
     "s": SGate,
+    "sdg": SdgGate,
+    "si": SdgGate,
     "t": TGate,
+    "tdg": TdgGate,
+    "ti": TdgGate,
+    "sx": SXGate,
+    "sxdg": SXdgGate,
     "i": IGate,
     "id": IGate,
+    # Parametric single-qubit gates
     "rx": RXGate,
     "ry": RYGate,
     "rz": RZGate,
     "u3": U3Gate,
+    "u": U3Gate,
+    "p": PhaseGate,
+    "phase": PhaseGate,
+    "u1": U1Gate,
+    "u2": U2Gate,
+    "r": RGate,
+    # Two-qubit gates
     "cx": CXGate,
     "cnot": CXGate,
     "cz": CZGate,
     "swap": SwapGate,
+    # Controlled gates
+    "cy": CYGate,
+    "ch": CHGate,
+    "cs": CSGate,
+    "csdg": CSdgGate,
+    "crx": CRXGate,
+    "cry": CRYGate,
+    "crz": CRZGate,
+    "cp": CPhaseGate,
+    "cphase": CPhaseGate,
+    "cu1": CU1Gate,
+    "cu3": CU3Gate,
+    "cu": CU3Gate,
+    "csx": CSXGate,
+    # Two-qubit rotations
     "rzz": RZZGate,
+    "rxx": RXXGate,
+    "ryy": RYYGate,
+    "rzx": RZXGate,
+    # Two-qubit special
+    "iswap": iSwapGate,
+    "dcx": DCXGate,
+    "ecr": ECRGate,
+    # Three-qubit gates
     "ccx": ToffoliGate,
     "toffoli": ToffoliGate,
+    "ccz": CCZGate,
     "cswap": FredkinGate,
     "fredkin": FredkinGate,
+    # Special
+    "reset": Reset,
 }

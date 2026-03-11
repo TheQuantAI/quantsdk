@@ -16,25 +16,52 @@ from typing import Any
 
 from quantsdk.gates import (
     Barrier,
+    CCZGate,
+    CHGate,
+    CPhaseGate,
+    CRXGate,
+    CRYGate,
+    CRZGate,
+    CSdgGate,
+    CSGate,
+    CSXGate,
+    CU1Gate,
+    CU3Gate,
     CXGate,
+    CYGate,
     CZGate,
+    DCXGate,
+    ECRGate,
     FredkinGate,
     Gate,
     HGate,
     IGate,
     Measure,
+    PhaseGate,
+    Reset,
+    RGate,
     RXGate,
+    RXXGate,
     RYGate,
+    RYYGate,
     RZGate,
+    RZXGate,
     RZZGate,
+    SdgGate,
     SGate,
     SwapGate,
+    SXdgGate,
+    SXGate,
+    TdgGate,
     TGate,
     ToffoliGate,
+    U1Gate,
+    U2Gate,
     U3Gate,
     XGate,
     YGate,
     ZGate,
+    iSwapGate,
 )
 
 
@@ -175,6 +202,30 @@ class Circuit:
         self._gates.append(IGate(qubit))
         return self
 
+    def sdg(self, qubit: int) -> Circuit:
+        """Apply S-dagger gate."""
+        self._validate_qubit(qubit)
+        self._gates.append(SdgGate(qubit))
+        return self
+
+    def tdg(self, qubit: int) -> Circuit:
+        """Apply T-dagger gate."""
+        self._validate_qubit(qubit)
+        self._gates.append(TdgGate(qubit))
+        return self
+
+    def sx(self, qubit: int) -> Circuit:
+        """Apply square root of X gate."""
+        self._validate_qubit(qubit)
+        self._gates.append(SXGate(qubit))
+        return self
+
+    def sxdg(self, qubit: int) -> Circuit:
+        """Apply square root of X dagger gate."""
+        self._validate_qubit(qubit)
+        self._gates.append(SXdgGate(qubit))
+        return self
+
     # ─── Parametric Single-Qubit Gates ───
 
     def rx(self, qubit: int, theta: float) -> Circuit:
@@ -199,6 +250,30 @@ class Circuit:
         """Apply general single-qubit rotation U3(theta, phi, lambda)."""
         self._validate_qubit(qubit)
         self._gates.append(U3Gate(qubit, theta, phi, lam))
+        return self
+
+    def p(self, qubit: int, lam: float) -> Circuit:
+        """Apply Phase gate P(lam)."""
+        self._validate_qubit(qubit)
+        self._gates.append(PhaseGate(qubit, lam))
+        return self
+
+    def u1(self, qubit: int, lam: float) -> Circuit:
+        """Apply U1 gate (equivalent to Phase)."""
+        self._validate_qubit(qubit)
+        self._gates.append(U1Gate(qubit, lam))
+        return self
+
+    def u2(self, qubit: int, phi: float, lam: float) -> Circuit:
+        """Apply U2 gate."""
+        self._validate_qubit(qubit)
+        self._gates.append(U2Gate(qubit, phi, lam))
+        return self
+
+    def r(self, qubit: int, theta: float, phi: float) -> Circuit:
+        """Apply general rotation R(theta, phi) gate."""
+        self._validate_qubit(qubit)
+        self._gates.append(RGate(qubit, theta, phi))
         return self
 
     # ─── Two-Qubit Gates ───
@@ -231,6 +306,116 @@ class Circuit:
         self._gates.append(RZZGate(qubit1, qubit2, theta))
         return self
 
+    # ─── Controlled Gates ───
+
+    def cy(self, control: int, target: int) -> Circuit:
+        """Apply Controlled-Y gate."""
+        self._validate_qubits(control, target)
+        self._gates.append(CYGate(control, target))
+        return self
+
+    def ch(self, control: int, target: int) -> Circuit:
+        """Apply Controlled-Hadamard gate."""
+        self._validate_qubits(control, target)
+        self._gates.append(CHGate(control, target))
+        return self
+
+    def cs(self, control: int, target: int) -> Circuit:
+        """Apply Controlled-S gate."""
+        self._validate_qubits(control, target)
+        self._gates.append(CSGate(control, target))
+        return self
+
+    def csdg(self, control: int, target: int) -> Circuit:
+        """Apply Controlled-S-dagger gate."""
+        self._validate_qubits(control, target)
+        self._gates.append(CSdgGate(control, target))
+        return self
+
+    def crx(self, control: int, target: int, theta: float) -> Circuit:
+        """Apply Controlled-RX gate."""
+        self._validate_qubits(control, target)
+        self._gates.append(CRXGate(control, target, theta))
+        return self
+
+    def cry(self, control: int, target: int, theta: float) -> Circuit:
+        """Apply Controlled-RY gate."""
+        self._validate_qubits(control, target)
+        self._gates.append(CRYGate(control, target, theta))
+        return self
+
+    def crz(self, control: int, target: int, theta: float) -> Circuit:
+        """Apply Controlled-RZ gate."""
+        self._validate_qubits(control, target)
+        self._gates.append(CRZGate(control, target, theta))
+        return self
+
+    def cp(self, control: int, target: int, lam: float) -> Circuit:
+        """Apply Controlled-Phase gate."""
+        self._validate_qubits(control, target)
+        self._gates.append(CPhaseGate(control, target, lam))
+        return self
+
+    def cu1(self, control: int, target: int, lam: float) -> Circuit:
+        """Apply Controlled-U1 gate."""
+        self._validate_qubits(control, target)
+        self._gates.append(CU1Gate(control, target, lam))
+        return self
+
+    def cu3(
+        self, control: int, target: int, theta: float, phi: float, lam: float
+    ) -> Circuit:
+        """Apply Controlled-U3 gate."""
+        self._validate_qubits(control, target)
+        self._gates.append(CU3Gate(control, target, theta, phi, lam))
+        return self
+
+    def csx(self, control: int, target: int) -> Circuit:
+        """Apply Controlled-SX gate."""
+        self._validate_qubits(control, target)
+        self._gates.append(CSXGate(control, target))
+        return self
+
+    # ─── Two-Qubit Rotation Gates ───
+
+    def rxx(self, qubit1: int, qubit2: int, theta: float) -> Circuit:
+        """Apply RXX gate (XX-rotation)."""
+        self._validate_qubits(qubit1, qubit2)
+        self._gates.append(RXXGate(qubit1, qubit2, theta))
+        return self
+
+    def ryy(self, qubit1: int, qubit2: int, theta: float) -> Circuit:
+        """Apply RYY gate (YY-rotation)."""
+        self._validate_qubits(qubit1, qubit2)
+        self._gates.append(RYYGate(qubit1, qubit2, theta))
+        return self
+
+    def rzx(self, qubit1: int, qubit2: int, theta: float) -> Circuit:
+        """Apply RZX gate (ZX-rotation)."""
+        self._validate_qubits(qubit1, qubit2)
+        self._gates.append(RZXGate(qubit1, qubit2, theta))
+        return self
+
+    # ─── Two-Qubit Special Gates ───
+
+    def iswap(self, qubit1: int, qubit2: int) -> Circuit:
+        """Apply iSWAP gate."""
+        self._validate_qubits(qubit1, qubit2)
+        self._gates.append(iSwapGate(qubit1, qubit2))
+        return self
+
+    def dcx(self, qubit1: int, qubit2: int) -> Circuit:
+        """Apply Double-CX gate."""
+        self._validate_qubits(qubit1, qubit2)
+        self._gates.append(DCXGate(qubit1, qubit2))
+        return self
+
+    def ecr(self, qubit1: int, qubit2: int) -> Circuit:
+        """Apply Echoed Cross-Resonance gate."""
+        self._validate_qubits(qubit1, qubit2)
+        self._gates.append(ECRGate(qubit1, qubit2))
+        return self
+
     # ─── Three-Qubit Gates ───
 
     def ccx(self, control1: int, control2: int, target: int) -> Circuit:
@@ -252,6 +437,12 @@ class Circuit:
     def fredkin(self, control: int, target1: int, target2: int) -> Circuit:
         """Apply Fredkin gate (alias for cswap)."""
         return self.cswap(control, target1, target2)
+
+    def ccz(self, control1: int, control2: int, target: int) -> Circuit:
+        """Apply CCZ (double-controlled Z) gate."""
+        self._validate_qubits(control1, control2, target)
+        self._gates.append(CCZGate(control1, control2, target))
+        return self
 
     # ─── Measurement ───
 
@@ -282,6 +473,12 @@ class Circuit:
         for q in qubits:
             self._validate_qubit(q)
         self._gates.append(Barrier(qubits))
+        return self
+
+    def reset(self, qubit: int) -> Circuit:
+        """Reset a qubit to the |0> state."""
+        self._validate_qubit(qubit)
+        self._gates.append(Reset(qubit))
         return self
 
     def copy(self) -> Circuit:

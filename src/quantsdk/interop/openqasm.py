@@ -15,25 +15,52 @@ import re
 from quantsdk.circuit import Circuit
 from quantsdk.gates import (
     Barrier,
+    CCZGate,
+    CHGate,
+    CPhaseGate,
+    CRXGate,
+    CRYGate,
+    CRZGate,
+    CSdgGate,
+    CSGate,
+    CSXGate,
+    CU1Gate,
+    CU3Gate,
     CXGate,
+    CYGate,
     CZGate,
+    DCXGate,
+    ECRGate,
     FredkinGate,
     Gate,
     HGate,
     IGate,
     Measure,
+    PhaseGate,
+    Reset,
+    RGate,
     RXGate,
+    RXXGate,
     RYGate,
+    RYYGate,
     RZGate,
+    RZXGate,
     RZZGate,
+    SdgGate,
     SGate,
     SwapGate,
+    SXdgGate,
+    SXGate,
+    TdgGate,
     TGate,
     ToffoliGate,
+    U1Gate,
+    U2Gate,
     U3Gate,
     XGate,
     YGate,
     ZGate,
+    iSwapGate,
 )
 
 
@@ -147,6 +174,87 @@ def _gate_to_qasm(gate: Gate, clbit_index: int) -> str | None:
     if isinstance(gate, FredkinGate):
         return f"cswap q[{q[0]}],q[{q[1]}],q[{q[2]}];"
 
+    if isinstance(gate, SdgGate):
+        return f"sdg q[{q[0]}];"
+
+    if isinstance(gate, TdgGate):
+        return f"tdg q[{q[0]}];"
+
+    if isinstance(gate, SXGate):
+        return f"sx q[{q[0]}];"
+
+    if isinstance(gate, SXdgGate):
+        return f"sxdg q[{q[0]}];"
+
+    if isinstance(gate, PhaseGate):
+        return f"p({gate.params[0]}) q[{q[0]}];"
+
+    if isinstance(gate, U1Gate):
+        return f"u1({gate.params[0]}) q[{q[0]}];"
+
+    if isinstance(gate, U2Gate):
+        return f"u2({gate.params[0]},{gate.params[1]}) q[{q[0]}];"
+
+    if isinstance(gate, RGate):
+        return f"r({gate.params[0]},{gate.params[1]}) q[{q[0]}];"
+
+    if isinstance(gate, CYGate):
+        return f"cy q[{q[0]}],q[{q[1]}];"
+
+    if isinstance(gate, CHGate):
+        return f"ch q[{q[0]}],q[{q[1]}];"
+
+    if isinstance(gate, CSGate):
+        return f"cs q[{q[0]}],q[{q[1]}];"
+
+    if isinstance(gate, CSdgGate):
+        return f"csdg q[{q[0]}],q[{q[1]}];"
+
+    if isinstance(gate, CRXGate):
+        return f"crx({gate.params[0]}) q[{q[0]}],q[{q[1]}];"
+
+    if isinstance(gate, CRYGate):
+        return f"cry({gate.params[0]}) q[{q[0]}],q[{q[1]}];"
+
+    if isinstance(gate, CRZGate):
+        return f"crz({gate.params[0]}) q[{q[0]}],q[{q[1]}];"
+
+    if isinstance(gate, CPhaseGate):
+        return f"cp({gate.params[0]}) q[{q[0]}],q[{q[1]}];"
+
+    if isinstance(gate, CU1Gate):
+        return f"cu1({gate.params[0]}) q[{q[0]}],q[{q[1]}];"
+
+    if isinstance(gate, CU3Gate):
+        return f"cu3({gate.params[0]},{gate.params[1]},{gate.params[2]}) q[{q[0]}],q[{q[1]}];"
+
+    if isinstance(gate, CSXGate):
+        return f"csx q[{q[0]}],q[{q[1]}];"
+
+    if isinstance(gate, RXXGate):
+        return f"rxx({gate.params[0]}) q[{q[0]}],q[{q[1]}];"
+
+    if isinstance(gate, RYYGate):
+        return f"ryy({gate.params[0]}) q[{q[0]}],q[{q[1]}];"
+
+    if isinstance(gate, RZXGate):
+        return f"rzx({gate.params[0]}) q[{q[0]}],q[{q[1]}];"
+
+    if isinstance(gate, iSwapGate):
+        return f"iswap q[{q[0]}],q[{q[1]}];"
+
+    if isinstance(gate, DCXGate):
+        return f"dcx q[{q[0]}],q[{q[1]}];"
+
+    if isinstance(gate, ECRGate):
+        return f"ecr q[{q[0]}],q[{q[1]}];"
+
+    if isinstance(gate, CCZGate):
+        return f"ccz q[{q[0]}],q[{q[1]}],q[{q[2]}];"
+
+    if isinstance(gate, Reset):
+        return f"reset q[{q[0]}];"
+
     raise ValueError(f"Unsupported gate for OpenQASM export: {gate.name}")
 
 
@@ -168,18 +276,45 @@ _QASM_GATE_BUILDERS: dict[str, type[Gate]] = {
     "y": YGate,
     "z": ZGate,
     "s": SGate,
+    "sdg": SdgGate,
     "t": TGate,
+    "tdg": TdgGate,
+    "sx": SXGate,
+    "sxdg": SXdgGate,
     "id": IGate,
     "rx": RXGate,
     "ry": RYGate,
     "rz": RZGate,
+    "p": PhaseGate,
+    "u1": U1Gate,
+    "u2": U2Gate,
+    "r": RGate,
     "u3": U3Gate,
-    "u": U3Gate,  # Qiskit uses 'u' for u3
+    "u": U3Gate,
     "cx": CXGate,
     "cz": CZGate,
+    "cy": CYGate,
+    "ch": CHGate,
+    "cs": CSGate,
+    "csdg": CSdgGate,
+    "crx": CRXGate,
+    "cry": CRYGate,
+    "crz": CRZGate,
+    "cp": CPhaseGate,
+    "cu1": CU1Gate,
+    "cu3": CU3Gate,
+    "cu": CU3Gate,
+    "csx": CSXGate,
     "swap": SwapGate,
+    "iswap": iSwapGate,
+    "dcx": DCXGate,
+    "ecr": ECRGate,
+    "rxx": RXXGate,
+    "ryy": RYYGate,
     "rzz": RZZGate,
+    "rzx": RZXGate,
     "ccx": ToffoliGate,
+    "ccz": CCZGate,
     "cswap": FredkinGate,
 }
 
@@ -278,6 +413,13 @@ def from_openqasm(qasm_str: str) -> Circuit:
             circuit.barrier(qubits)
             continue
 
+        # Parse reset
+        m_reset = re.match(r"reset\s+(\w+)\[(\d+)\];", line)
+        if m_reset:
+            qubit = int(m_reset.group(2))
+            circuit._gates.append(Reset(qubit))
+            continue
+
         # Parse gate with parameters: gate(params) qargs;
         m = _RE_GATE_WITH_PARAM.match(line)
         if m:
@@ -318,23 +460,38 @@ def _add_gate(
         )
 
     # Build the gate based on its class
-    if gate_class in (HGate, XGate, YGate, ZGate, SGate, TGate, IGate):
+    if gate_class in (
+        HGate, XGate, YGate, ZGate, SGate, SdgGate,
+        TGate, TdgGate, SXGate, SXdgGate, IGate,
+    ):
         circuit._gates.append(gate_class(qubits[0]))
 
-    elif gate_class in (RXGate, RYGate, RZGate):
+    elif gate_class in (RXGate, RYGate, RZGate, PhaseGate, U1Gate):
         circuit._gates.append(gate_class(qubits[0], params[0]))
+
+    elif gate_class in (U2Gate, RGate):
+        circuit._gates.append(gate_class(qubits[0], params[0], params[1]))
 
     elif gate_class is U3Gate:
         circuit._gates.append(U3Gate(qubits[0], params[0], params[1], params[2]))
 
-    elif gate_class in (CXGate, CZGate, SwapGate):
+    elif gate_class in (
+        CXGate, CZGate, CYGate, CHGate, CSGate, CSdgGate,
+        CSXGate, SwapGate, iSwapGate, DCXGate, ECRGate,
+    ):
         circuit._gates.append(gate_class(qubits[0], qubits[1]))
 
-    elif gate_class is RZZGate:
-        circuit._gates.append(RZZGate(qubits[0], qubits[1], params[0]))
+    elif gate_class in (CRXGate, CRYGate, CRZGate, CPhaseGate, CU1Gate) or gate_class in (RXXGate, RYYGate, RZZGate, RZXGate):
+        circuit._gates.append(gate_class(qubits[0], qubits[1], params[0]))
+
+    elif gate_class is CU3Gate:
+        circuit._gates.append(CU3Gate(qubits[0], qubits[1], params[0], params[1], params[2]))
 
     elif gate_class is ToffoliGate:
         circuit._gates.append(ToffoliGate(qubits[0], qubits[1], qubits[2]))
+
+    elif gate_class is CCZGate:
+        circuit._gates.append(CCZGate(qubits[0], qubits[1], qubits[2]))
 
     elif gate_class is FredkinGate:
         circuit._gates.append(FredkinGate(qubits[0], qubits[1], qubits[2]))

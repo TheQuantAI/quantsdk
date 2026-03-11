@@ -19,7 +19,7 @@ import numpy as np
 
 from quantsdk.backend import Backend, BackendInfo, BackendStatus
 from quantsdk.circuit import Circuit
-from quantsdk.gates import Gate, Measure
+from quantsdk.gates import Gate, Measure, Reset
 from quantsdk.result import Result
 
 
@@ -50,8 +50,13 @@ class LocalSimulator(Backend):
             status=BackendStatus.ONLINE,
             is_simulator=True,
             native_gates=frozenset(
-                ["H", "X", "Y", "Z", "S", "T", "I", "RX", "RY", "RZ", "U3",
-                 "CX", "CZ", "SWAP", "RZZ", "CCX", "CSWAP"]
+                ["H", "X", "Y", "Z", "S", "Sdg", "T", "Tdg", "SX", "SXdg", "I",
+                 "RX", "RY", "RZ", "U3", "P", "U1", "U2", "R",
+                 "CX", "CZ", "CY", "CH", "CS", "CSdg",
+                 "CRX", "CRY", "CRZ", "CP", "CU1", "CU3", "CSX",
+                 "SWAP", "iSWAP", "DCX", "ECR",
+                 "RZZ", "RXX", "RYY", "RZX",
+                 "CCX", "CCZ", "CSWAP", "RESET"]
             ),
             max_shots=1_000_000,
             queue_depth=0,
@@ -95,6 +100,10 @@ class LocalSimulator(Backend):
                 measured_qubits.append(gate.qubits[0])
                 continue
             if gate.name == "BARRIER":
+                continue
+            if isinstance(gate, Reset):
+                # Project qubit to |0> by measuring and flipping if |1>
+                statevector = self._apply_reset(statevector, gate.qubits[0], n, rng)
                 continue
 
             statevector = self._apply_gate(statevector, gate, n)
@@ -185,4 +194,35 @@ class LocalSimulator(Backend):
         sv = np.tensordot(matrix_reshaped, sv, axes=(contraction_axes, qubits))
         # Move axes back
         sv = np.moveaxis(sv, list(range(k)), sorted(qubits))
+        return sv.reshape(2**n)
+
+    def _apply_reset(
+        self, sv: np.ndarray, qubit: int, n: int, rng: np.random.Generator
+    ) -> np.ndarray:
+        """Reset a qubit to |0> by projecting and renormalizing."""
+        sv = sv.reshape([2] * n)
+        # Get probability of qubit being |1>
+        prob_1 = np.sum(np.abs(np.take(sv, [1], axis=qubit)) ** 2)
+        if prob_1 > 1e-12:
+            # Project onto |0> for the target qubit and renormalize
+            slices_0: list[slice | int] = [slice(None)] * n
+            slices_1: list[slice | int] = [slice(None)] * n
+            slices_0[qubit] = 0
+            slices_1[qubit] = 1
+            # Combine amplitudes: |0><0| + |0><1| (trace out and put into |0>)
+            combined = np.zeros_like(sv)
+            combined[tuple(slices_0)] = np.sqrt(
+                np.abs(sv[tuple(slices_0)]) ** 2 + np.abs(sv[tuple(slices_1)]) ** 2
+            )
+            # Preserve relative phases from the |0> component where possible
+            phase_0 = sv[tuple(slices_0)]
+            norms = np.abs(phase_0)
+            safe_mask = norms > 1e-12
+            phases = np.ones_like(phase_0)
+            phases[safe_mask] = phase_0[safe_mask] / norms[safe_mask]
+            combined[tuple(slices_0)] *= phases
+            sv = combined
+        norm = np.linalg.norm(sv)
+        if norm > 1e-12:
+            sv = sv / norm
         return sv.reshape(2**n)
