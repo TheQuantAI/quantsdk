@@ -1,0 +1,157 @@
+# QuantSDK Documentation
+# Built with MkDocs Material — https://squidfunk.github.io/mkdocs-material/
+
+site_name: QuantSDK Documentation
+site_url: https://docs.thequantcloud.com
+site_description: "Write quantum code once, run anywhere — QuantSDK by TheQuantAI"
+site_author: TheQuantAI
+repo_url: https://github.com/TheQuantAI/quantsdk
+repo_name: TheQuantAI/quantsdk
+edit_uri: edit/main/docs/
+
+copyright: Copyright &copy; 2026 TheQuantAI
+
+theme:
+  name: material
+  custom_dir: docs/overrides
+  palette:
+    - scheme: default
+      primary: deep purple
+      accent: amber
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+    - scheme: slate
+      primary: deep purple
+      accent: amber
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode
+  font:
+    text: Inter
+    code: JetBrains Mono
+  icon:
+    repo: fontawesome/brands/github
+    logo: material/atom
+  features:
+    - navigation.instant
+    - navigation.tracking
+    - navigation.tabs
+    - navigation.tabs.sticky
+    - navigation.sections
+    - navigation.expand
+    - navigation.top
+    - navigation.footer
+    - search.suggest
+    - search.highlight
+    - content.code.copy
+    - content.code.annotate
+    - content.tabs.link
+    - toc.follow
+
+plugins:
+  - search
+  - mkdocstrings:
+      default_handler: python
+      handlers:
+        python:
+          paths: [src]
+          options:
+            show_source: true
+            show_root_heading: true
+            show_root_full_path: false
+            show_category_heading: true
+            show_symbol_type_heading: true
+            show_symbol_type_toc: true
+            docstring_style: google
+            docstring_section_style: spacy
+            members_order: source
+            merge_init_into_class: true
+            show_signature_annotations: true
+            separate_signature: true
+            signature_crossrefs: true
+
+markdown_extensions:
+  - admonition
+  - pymdownx.details
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
+  - pymdownx.highlight:
+      anchor_linenums: true
+      line_spans: __span
+      pygments_lang_class: true
+  - pymdownx.inlinehilite
+  - pymdownx.snippets:
+      base_path:
+        - "."
+  - pymdownx.tabbed:
+      alternate_style: true
+  - pymdownx.arithmatex:
+      generic: true
+  - pymdownx.emoji:
+      emoji_index: !!python/name:material.extensions.emoji.twemoji
+      emoji_generator: !!python/name:material.extensions.emoji.to_svg
+  - attr_list
+  - md_in_html
+  - tables
+  - footnotes
+  - toc:
+      permalink: true
+
+extra:
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/TheQuantAI
+    - icon: fontawesome/brands/twitter
+      link: https://twitter.com/TheQuantAI
+    - icon: fontawesome/brands/linkedin
+      link: https://linkedin.com/company/thequantai
+    - icon: fontawesome/brands/discord
+      link: https://discord.gg/thequantai
+  version:
+    provider: mike
+
+extra_css:
+  - stylesheets/extra.css
+
+extra_javascript:
+  - javascripts/mathjax.js
+  - https://unpkg.com/mathjax@3/es5/tex-mml-chtml.js
+
+nav:
+  - Home: index.md
+  - Getting Started:
+    - getting-started/index.md
+    - Installation: getting-started/installation.md
+    - Quick Start: getting-started/quickstart.md
+    - Your First Circuit: getting-started/first-circuit.md
+    - Running on Real Hardware: getting-started/real-hardware.md
+  - API Reference:
+    - api/index.md
+    - Circuit: api/circuit.md
+    - Gates: api/gates.md
+    - Result: api/result.md
+    - Backend: api/backend.md
+    - Framework Interop: api/interop.md
+  - Tutorials:
+    - tutorials/index.md
+    - "01 - Bell State & Entanglement": tutorials/01-bell-state.md
+    - "02 - Quantum Teleportation": tutorials/02-teleportation.md
+    - "03 - Deutsch-Jozsa Algorithm": tutorials/03-deutsch-jozsa.md
+    - "04 - Bernstein-Vazirani": tutorials/04-bernstein-vazirani.md
+    - "05 - Simon's Algorithm": tutorials/05-simons-algorithm.md
+    - "06 - Grover's Search": tutorials/06-grovers-search.md
+    - "07 - Quantum Fourier Transform": tutorials/07-qft.md
+    - "08 - VQE (Variational Eigensolver)": tutorials/08-vqe.md
+    - "09 - QAOA for MaxCut": tutorials/09-qaoa.md
+    - "10 - Hybrid Algorithms": tutorials/10-hybrid-algorithms.md
+  - Backend Guides:
+    - backends/index.md
+    - Local Simulator: backends/local-simulator.md
+    - IBM Quantum: backends/ibm-quantum.md
+    - Adding Your Own Backend: backends/custom-backend.md
+  - Contributing: contributing.md
+  - Changelog: changelog.md
