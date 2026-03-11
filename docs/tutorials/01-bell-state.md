@@ -4,6 +4,10 @@
 **Level:** Beginner  
 **Concepts:** Superposition, entanglement, measurement
 
+!!! tip "Try it interactively"
+    This tutorial is also available as a Jupyter notebook you can run locally:  
+    [:material-notebook: Open `02_bell_states.ipynb`](https://github.com/TheQuantAI/quantsdk/blob/main/examples/02_bell_states.ipynb){ .md-button }
+
 ## What You'll Build
 
 A **Bell State** — the simplest example of quantum entanglement. Two qubits

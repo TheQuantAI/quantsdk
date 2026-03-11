@@ -4,6 +4,10 @@
 **Level:** Advanced  
 **Concepts:** Parameterized circuits, classical optimization loop, gradient estimation
 
+!!! tip "Try it interactively"
+    This tutorial is also available as a Jupyter notebook you can run locally:  
+    [:material-notebook: Open `18_hybrid_algorithms.ipynb`](https://github.com/TheQuantAI/quantsdk/blob/main/examples/18_hybrid_algorithms.ipynb){ .md-button }
+
 ## Overview
 
 Hybrid algorithms combine quantum and classical processing in a loop:

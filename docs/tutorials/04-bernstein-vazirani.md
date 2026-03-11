@@ -4,6 +4,10 @@
 **Level:** Intermediate  
 **Concepts:** Hidden string problem, quantum query complexity
 
+!!! tip "Try it interactively"
+    This tutorial is also available as a Jupyter notebook you can run locally:  
+    [:material-notebook: Open `10_bernstein_vazirani.ipynb`](https://github.com/TheQuantAI/quantsdk/blob/main/examples/10_bernstein_vazirani.ipynb){ .md-button }
+
 ## The Problem
 
 Given a black-box function $f(x) = s \cdot x \pmod{2}$ where $s$ is a hidden

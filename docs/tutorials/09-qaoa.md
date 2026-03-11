@@ -4,6 +4,10 @@
 **Level:** Advanced  
 **Concepts:** Combinatorial optimization, problem Hamiltonian, mixer Hamiltonian
 
+!!! tip "Try it interactively"
+    This tutorial is also available as a Jupyter notebook you can run locally:  
+    [:material-notebook: Open `16_qaoa_maxcut.ipynb`](https://github.com/TheQuantAI/quantsdk/blob/main/examples/16_qaoa_maxcut.ipynb){ .md-button }
+
 ## What is QAOA?
 
 The **Quantum Approximate Optimization Algorithm** (QAOA) finds approximate

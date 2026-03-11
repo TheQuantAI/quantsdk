@@ -4,6 +4,10 @@
 **Level:** Advanced  
 **Concepts:** Phase estimation, periodicity, Shor's algorithm foundation
 
+!!! tip "Try it interactively"
+    This tutorial is also available as a Jupyter notebook you can run locally:  
+    [:material-notebook: Open `13_qft.ipynb`](https://github.com/TheQuantAI/quantsdk/blob/main/examples/13_qft.ipynb){ .md-button }
+
 ## What is the QFT?
 
 The Quantum Fourier Transform maps computational basis states to frequency

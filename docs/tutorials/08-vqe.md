@@ -4,6 +4,10 @@
 **Level:** Advanced  
 **Concepts:** Hybrid quantum-classical algorithms, parameterized circuits, optimization
 
+!!! tip "Try it interactively"
+    This tutorial is also available as a Jupyter notebook you can run locally:  
+    [:material-notebook: Open `15_vqe.ipynb`](https://github.com/TheQuantAI/quantsdk/blob/main/examples/15_vqe.ipynb){ .md-button }
+
 ## What is VQE?
 
 The **Variational Quantum Eigensolver** finds the ground state energy of a

@@ -4,6 +4,10 @@
 **Level:** Beginner  
 **Concepts:** Entanglement, classical communication, Bell measurement
 
+!!! tip "Try it interactively"
+    This tutorial is also available as a Jupyter notebook you can run locally:  
+    [:material-notebook: Open `08_teleportation.ipynb`](https://github.com/TheQuantAI/quantsdk/blob/main/examples/08_teleportation.ipynb){ .md-button }
+
 ## What You'll Build
 
 A **quantum teleportation** circuit — the protocol that transfers a quantum

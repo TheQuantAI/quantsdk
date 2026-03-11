@@ -4,6 +4,10 @@
 **Level:** Beginner  
 **Concepts:** Quantum parallelism, oracles, deterministic speedup
 
+!!! tip "Try it interactively"
+    This tutorial is also available as a Jupyter notebook you can run locally:  
+    [:material-notebook: Open `09_deutsch_jozsa.ipynb`](https://github.com/TheQuantAI/quantsdk/blob/main/examples/09_deutsch_jozsa.ipynb){ .md-button }
+
 ## What You'll Build
 
 The **Deutsch-Jozsa algorithm** — the first quantum algorithm to demonstrate

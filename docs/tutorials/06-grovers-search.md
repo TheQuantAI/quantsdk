@@ -4,6 +4,10 @@
 **Level:** Intermediate  
 **Concepts:** Amplitude amplification, oracle design, quadratic speedup
 
+!!! tip "Try it interactively"
+    This tutorial is also available as a Jupyter notebook you can run locally:  
+    [:material-notebook: Open `12_grovers_search.ipynb`](https://github.com/TheQuantAI/quantsdk/blob/main/examples/12_grovers_search.ipynb){ .md-button }
+
 ## The Problem
 
 Search an unsorted database of $N = 2^n$ items for a marked item.

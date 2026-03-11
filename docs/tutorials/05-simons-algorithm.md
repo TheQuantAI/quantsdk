@@ -4,6 +4,10 @@
 **Level:** Intermediate  
 **Concepts:** Period finding, exponential quantum speedup
 
+!!! tip "Try it interactively"
+    This tutorial is also available as a Jupyter notebook you can run locally:  
+    [:material-notebook: Open `11_simons_algorithm.ipynb`](https://github.com/TheQuantAI/quantsdk/blob/main/examples/11_simons_algorithm.ipynb){ .md-button }
+
 ## The Problem
 
 Given a 2-to-1 function $f: \{0,1\}^n \rightarrow \{0,1\}^n$ with a hidden
