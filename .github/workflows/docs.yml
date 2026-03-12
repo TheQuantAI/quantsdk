@@ -1,0 +1,36 @@
+# Deploy MkDocs to GitHub Pages at docs.thequantcloud.com
+name: Docs
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'docs/**'
+      - 'mkdocs.yml'
+      - 'src/**'          # rebuild if source changes (for API docs)
+  workflow_dispatch:
+
+permissions:
+  contents: write      # push to gh-pages branch
+
+jobs:
+  deploy:
+    name: Deploy Documentation
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install dependencies
+        run: |
+          pip install --upgrade pip
+          pip install -e ".[dev]"
+          pip install mkdocs-material mkdocstrings[python]
+
+      - name: Build & Deploy
+        run: mkdocs gh-deploy --force --clean
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
