@@ -51,13 +51,13 @@ class TestCircuitConvenienceMethods:
 
     def test_from_openqasm_classmethod(self):
         """Circuit.from_openqasm() parses a QASM string."""
-        qasm = '''
+        qasm = """
         OPENQASM 2.0;
         include "qelib1.inc";
         qreg q[2];
         h q[0];
         cx q[0],q[1];
-        '''
+        """
         c = Circuit.from_openqasm(qasm)
         assert c.num_qubits == 2
         assert len(c.gates) == 2

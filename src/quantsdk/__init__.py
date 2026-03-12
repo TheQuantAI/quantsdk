@@ -19,7 +19,8 @@ Quick Start::
     print(result.counts)  # {'00': 503, '11': 497}
 """
 
-from importlib.metadata import PackageNotFoundError, version as _version
+from importlib.metadata import PackageNotFoundError
+from importlib.metadata import version as _version
 
 try:
     __version__ = _version("quantsdk")
@@ -37,12 +38,15 @@ __all__ = [
     "run",
 ]
 
+
 # Lazy imports for optional modules — available as qs.interop, qs.backends
-def __getattr__(name: str):
+def __getattr__(name: str) -> object:
     if name == "interop":
         from quantsdk import interop
+
         return interop
     if name == "backends":
         from quantsdk import backends
+
         return backends
     raise AttributeError(f"module 'quantsdk' has no attribute {name!r}")

@@ -138,9 +138,7 @@ class TestTwoQubitGateMatrices:
         assert is_unitary(CXGate(0, 1).matrix())
 
     def test_cx_matrix(self):
-        expected = np.array(
-            [[1, 0, 0, 0], [0, 1, 0, 0], [0, 0, 0, 1], [0, 0, 1, 0]], dtype=complex
-        )
+        expected = np.array([[1, 0, 0, 0], [0, 1, 0, 0], [0, 0, 0, 1], [0, 0, 1, 0]], dtype=complex)
         np.testing.assert_allclose(CXGate(0, 1).matrix(), expected)
 
     def test_cz_unitary(self):

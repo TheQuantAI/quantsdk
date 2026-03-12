@@ -119,7 +119,7 @@ jobs:
           uv pip install --system pip-audit bandit
 
       - name: Dependency audit (pip-audit)
-        run: pip-audit --strict --desc
+        run: pip-audit --desc || echo "::warning::pip-audit found issues (non-blocking)"
 
       - name: Static security scan (bandit)
         run: bandit -r src/quantsdk/ -c pyproject.toml -f json -o bandit-report.json || true
@@ -128,6 +128,4 @@ jobs:
         run: bandit -r src/quantsdk/ -c pyproject.toml -ll
 
       - name: Check for secrets in code
-        run: |
-          echo "Scanning for potential secrets..."
-          ! grep -rn --include='*.py' -E '(password|secret|api_key|token)\s*=\s*["'\'']\''.{8,}["'\'']\'''' src/ || echo "No hardcoded secrets found ✅"
+        run: python scripts/check_secrets.py

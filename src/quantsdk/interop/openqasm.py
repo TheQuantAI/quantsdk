@@ -353,7 +353,7 @@ def _safe_eval_param(expr: str) -> float:
         for name in code.co_names:
             raise ValueError(f"Name '{name}' not allowed in parameter expression")
         # Sandboxed eval: regex-validated input, no builtins, no names allowed
-        return float(eval(code, {"__builtins__": {}}, {}))  # noqa: S307 # nosec B307
+        return float(eval(code, {"__builtins__": {}}, {}))  # nosec B307
     except (ValueError, SyntaxError, TypeError, ZeroDivisionError) as e:
         raise ValueError(f"Cannot parse parameter: '{expr}'") from e
 
@@ -486,34 +486,56 @@ def _add_gate(
     gate_class = _QASM_GATE_BUILDERS.get(gate_name)
     if gate_class is None:
         raise ValueError(
-            f"Unsupported QASM gate: '{gate_name}'. "
-            f"Supported: {sorted(_QASM_GATE_BUILDERS.keys())}"
+            f"Unsupported QASM gate: '{gate_name}'. Supported: {sorted(_QASM_GATE_BUILDERS.keys())}"
         )
 
     # Build the gate based on its class
     if gate_class in (
-        HGate, XGate, YGate, ZGate, SGate, SdgGate,
-        TGate, TdgGate, SXGate, SXdgGate, IGate,
+        HGate,
+        XGate,
+        YGate,
+        ZGate,
+        SGate,
+        SdgGate,
+        TGate,
+        TdgGate,
+        SXGate,
+        SXdgGate,
+        IGate,
     ):
-        circuit._gates.append(gate_class(qubits[0]))
+        circuit._gates.append(gate_class(qubits[0]))  # type: ignore
 
     elif gate_class in (RXGate, RYGate, RZGate, PhaseGate, U1Gate):
-        circuit._gates.append(gate_class(qubits[0], params[0]))
+        circuit._gates.append(gate_class(qubits[0], params[0]))  # type: ignore
 
     elif gate_class in (U2Gate, RGate):
-        circuit._gates.append(gate_class(qubits[0], params[0], params[1]))
+        circuit._gates.append(gate_class(qubits[0], params[0], params[1]))  # type: ignore
 
     elif gate_class is U3Gate:
         circuit._gates.append(U3Gate(qubits[0], params[0], params[1], params[2]))
 
     elif gate_class in (
-        CXGate, CZGate, CYGate, CHGate, CSGate, CSdgGate,
-        CSXGate, SwapGate, iSwapGate, DCXGate, ECRGate,
+        CXGate,
+        CZGate,
+        CYGate,
+        CHGate,
+        CSGate,
+        CSdgGate,
+        CSXGate,
+        SwapGate,
+        iSwapGate,
+        DCXGate,
+        ECRGate,
     ):
-        circuit._gates.append(gate_class(qubits[0], qubits[1]))
+        circuit._gates.append(gate_class(qubits[0], qubits[1]))  # type: ignore
 
-    elif gate_class in (CRXGate, CRYGate, CRZGate, CPhaseGate, CU1Gate) or gate_class in (RXXGate, RYYGate, RZZGate, RZXGate):
-        circuit._gates.append(gate_class(qubits[0], qubits[1], params[0]))
+    elif gate_class in (CRXGate, CRYGate, CRZGate, CPhaseGate, CU1Gate) or gate_class in (
+        RXXGate,
+        RYYGate,
+        RZZGate,
+        RZXGate,
+    ):
+        circuit._gates.append(gate_class(qubits[0], qubits[1], params[0]))  # type: ignore
 
     elif gate_class is CU3Gate:
         circuit._gates.append(CU3Gate(qubits[0], qubits[1], params[0], params[1], params[2]))

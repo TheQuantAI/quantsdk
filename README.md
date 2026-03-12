@@ -5,11 +5,10 @@
 </p>
 
 <p align="center">
-  <a href="https://pypi.org/project/quantsdk/"><img src="https://img.shields.io/pypi/v/quantsdk?color=blue" alt="PyPI version"></a>
-  <a href="https://pypi.org/project/quantsdk/"><img src="https://img.shields.io/pypi/pyversions/quantsdk" alt="Python versions"></a>
+  <a href="https://github.com/TheQuantAI/quantsdk"><img src="https://img.shields.io/badge/version-0.1.0-blue" alt="Version"></a>
+  <a href="https://github.com/TheQuantAI/quantsdk"><img src="https://img.shields.io/badge/python-3.10%20|%203.11%20|%203.12%20|%203.13-blue" alt="Python versions"></a>
   <a href="https://github.com/TheQuantAI/quantsdk/blob/main/LICENSE"><img src="https://img.shields.io/github/license/TheQuantAI/quantsdk" alt="License"></a>
   <a href="https://github.com/TheQuantAI/quantsdk/actions"><img src="https://img.shields.io/github/actions/workflow/status/TheQuantAI/quantsdk/ci.yml?branch=main" alt="CI"></a>
-  <a href="https://codecov.io/gh/TheQuantAI/quantsdk"><img src="https://img.shields.io/codecov/c/github/TheQuantAI/quantsdk" alt="Coverage"></a>
 </p>
 
 <p align="center">

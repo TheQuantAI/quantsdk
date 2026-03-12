@@ -57,8 +57,7 @@ def _check_aer() -> None:
         import qiskit_aer  # noqa: F401
     except ImportError as e:
         raise ImportError(
-            "qiskit-aer is required for the AerBackend. "
-            "Install with: pip install quantsdk[ibm]"
+            "qiskit-aer is required for the AerBackend. Install with: pip install quantsdk[ibm]"
         ) from e
 
 
@@ -116,9 +115,7 @@ class IBMBackend(Backend):
         if backend_name:
             self._qiskit_backend = self._service.backend(backend_name)
         else:
-            self._qiskit_backend = self._service.least_busy(
-                simulator=False, operational=True
-            )
+            self._qiskit_backend = self._service.least_busy(simulator=False, operational=True)
             logger.info("Auto-selected backend: %s", self._qiskit_backend.name)
 
     def __repr__(self) -> str:

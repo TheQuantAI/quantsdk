@@ -119,8 +119,7 @@ def run(
             from quantsdk.backends.ibm import AerBackend
         except ImportError as e:
             raise ImportError(
-                "Aer backend requires qiskit-aer. "
-                "Install with: pip install quantsdk[ibm]"
+                "Aer backend requires qiskit-aer. Install with: pip install quantsdk[ibm]"
             ) from e
         aer = AerBackend(method=options.pop("method", "automatic"))
         return aer.run(circuit, shots=shots, seed=seed, **options)

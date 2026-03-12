@@ -3,7 +3,6 @@
 
 """Tests for the local simulator and end-to-end qs.run() API."""
 
-
 import pytest
 
 import quantsdk as qs

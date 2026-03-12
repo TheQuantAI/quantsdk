@@ -71,8 +71,7 @@ def _check_qiskit() -> None:
         import qiskit  # noqa: F401
     except ImportError as e:
         raise ImportError(
-            "Qiskit is required for Qiskit interop. "
-            "Install it with: pip install quantsdk[ibm]"
+            "Qiskit is required for Qiskit interop. Install it with: pip install quantsdk[ibm]"
         ) from e
 
 
@@ -225,8 +224,12 @@ def to_qiskit(circuit: Circuit) -> QiskitCircuit:
 
         elif isinstance(gate, CU3Gate):
             qc.cu(
-                gate.params[0], gate.params[1], gate.params[2], 0,
-                gate.qubits[0], gate.qubits[1],
+                gate.params[0],
+                gate.params[1],
+                gate.params[2],
+                0,
+                gate.qubits[0],
+                gate.qubits[1],
             )
 
         elif isinstance(gate, CSXGate):
@@ -374,8 +377,17 @@ def from_qiskit(qiskit_circuit: QiskitCircuit) -> Circuit:
 
         # Build the QuantSDK gate with appropriate arguments
         if gate_class in (
-            HGate, XGate, YGate, ZGate, SGate, SdgGate,
-            TGate, TdgGate, SXGate, SXdgGate, IGate,
+            HGate,
+            XGate,
+            YGate,
+            ZGate,
+            SGate,
+            SdgGate,
+            TGate,
+            TdgGate,
+            SXGate,
+            SXdgGate,
+            IGate,
         ):
             # Single-qubit, no params
             circuit._gates.append(gate_class(qubits[0]))
@@ -395,8 +407,17 @@ def from_qiskit(qiskit_circuit: QiskitCircuit) -> Circuit:
             )
 
         elif gate_class in (
-            CXGate, CZGate, CYGate, CHGate, CSGate, CSdgGate,
-            CSXGate, SwapGate, iSwapGate, DCXGate, ECRGate,
+            CXGate,
+            CZGate,
+            CYGate,
+            CHGate,
+            CSGate,
+            CSdgGate,
+            CSXGate,
+            SwapGate,
+            iSwapGate,
+            DCXGate,
+            ECRGate,
         ):
             # Two-qubit, no params
             circuit._gates.append(gate_class(qubits[0], qubits[1]))

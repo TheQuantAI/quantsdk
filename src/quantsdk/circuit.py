@@ -362,9 +362,7 @@ class Circuit:
         self._gates.append(CU1Gate(control, target, lam))
         return self
 
-    def cu3(
-        self, control: int, target: int, theta: float, phi: float, lam: float
-    ) -> Circuit:
+    def cu3(self, control: int, target: int, theta: float, phi: float, lam: float) -> Circuit:
         """Apply Controlled-U3 gate."""
         self._validate_qubits(control, target)
         self._gates.append(CU3Gate(control, target, theta, phi, lam))
@@ -657,7 +655,9 @@ class Circuit:
         return len(self._gates)
 
     def __repr__(self) -> str:
-        return f"Circuit(num_qubits={self._num_qubits}, name='{self._name}', gates={len(self._gates)})"
+        return (
+            f"Circuit(num_qubits={self._num_qubits}, name='{self._name}', gates={len(self._gates)})"
+        )
 
     def __str__(self) -> str:
         return self.draw()

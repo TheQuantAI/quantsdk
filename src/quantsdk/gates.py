@@ -231,9 +231,7 @@ class RZGate(Gate):
 
     def matrix(self) -> np.ndarray:
         theta = self.params[0]
-        return np.array(
-            [[np.exp(-1j * theta / 2), 0], [0, np.exp(1j * theta / 2)]], dtype=complex
-        )
+        return np.array([[np.exp(-1j * theta / 2), 0], [0, np.exp(1j * theta / 2)]], dtype=complex)
 
 
 class U3Gate(Gate):
@@ -335,9 +333,7 @@ class CXGate(Gate):
         object.__setattr__(self, "params", ())
 
     def matrix(self) -> np.ndarray:
-        return np.array(
-            [[1, 0, 0, 0], [0, 1, 0, 0], [0, 0, 0, 1], [0, 0, 1, 0]], dtype=complex
-        )
+        return np.array([[1, 0, 0, 0], [0, 1, 0, 0], [0, 0, 0, 1], [0, 0, 1, 0]], dtype=complex)
 
 
 class CZGate(Gate):
@@ -349,9 +345,7 @@ class CZGate(Gate):
         object.__setattr__(self, "params", ())
 
     def matrix(self) -> np.ndarray:
-        return np.array(
-            [[1, 0, 0, 0], [0, 1, 0, 0], [0, 0, 1, 0], [0, 0, 0, -1]], dtype=complex
-        )
+        return np.array([[1, 0, 0, 0], [0, 1, 0, 0], [0, 0, 1, 0], [0, 0, 0, -1]], dtype=complex)
 
 
 class SwapGate(Gate):
@@ -363,9 +357,7 @@ class SwapGate(Gate):
         object.__setattr__(self, "params", ())
 
     def matrix(self) -> np.ndarray:
-        return np.array(
-            [[1, 0, 0, 0], [0, 0, 1, 0], [0, 1, 0, 0], [0, 0, 0, 1]], dtype=complex
-        )
+        return np.array([[1, 0, 0, 0], [0, 0, 1, 0], [0, 1, 0, 0], [0, 0, 0, 1]], dtype=complex)
 
 
 class RZZGate(Gate):
@@ -537,9 +529,7 @@ class CU1Gate(Gate):
 class CU3Gate(Gate):
     """Controlled-U3 gate."""
 
-    def __init__(
-        self, control: int, target: int, theta: float, phi: float, lam: float
-    ) -> None:
+    def __init__(self, control: int, target: int, theta: float, phi: float, lam: float) -> None:
         object.__setattr__(self, "name", "CU3")
         object.__setattr__(self, "qubits", (control, target))
         object.__setattr__(self, "params", (theta, phi, lam))
@@ -779,6 +769,7 @@ class Barrier(Gate):
     def matrix(self) -> np.ndarray:
         raise NotImplementedError("Barrier is not a unitary operation")
 
+
 class Reset(Gate):
     """Reset gate -- resets a qubit to the |0> state."""
 
@@ -789,6 +780,7 @@ class Reset(Gate):
 
     def matrix(self) -> np.ndarray:
         raise NotImplementedError("Reset is not a unitary operation")
+
 
 # ─── Gate Registry ───
 

@@ -144,8 +144,7 @@ class Result:
             import pandas as pd
         except ImportError as e:
             raise ImportError(
-                "pandas is required for to_pandas(). "
-                "Install it with: pip install pandas"
+                "pandas is required for to_pandas(). Install it with: pip install pandas"
             ) from e
 
         rows = [
@@ -239,8 +238,10 @@ class Result:
             f"  Unique outcomes: {len(self.counts)}",
         ]
         if self.counts:
-            lines.append(f"  Most likely: '{self.most_likely}' "
-                         f"(p={self.get_probability(self.most_likely):.4f})")
+            lines.append(
+                f"  Most likely: '{self.most_likely}' "
+                f"(p={self.get_probability(self.most_likely):.4f})"
+            )
             lines.append("  Top results:")
             for bitstring, count, prob in self.top_k(5):
                 bar = "█" * int(prob * 40)

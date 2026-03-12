@@ -223,6 +223,7 @@ class TestControlledGates:
     def test_cphase_pi_is_cz(self):
         """CP(pi) = CZ"""
         from quantsdk.gates import CZGate
+
         cp = CPhaseGate(0, 1, math.pi).matrix()
         cz = CZGate(0, 1).matrix()
         np.testing.assert_allclose(cp, cz, atol=1e-10)
@@ -239,9 +240,7 @@ class TestControlledGates:
             assert is_unitary(CU3Gate(0, 1, theta, phi, lam).matrix())
 
     def test_cu3_zero_is_identity(self):
-        np.testing.assert_allclose(
-            CU3Gate(0, 1, 0, 0, 0).matrix(), np.eye(4), atol=1e-10
-        )
+        np.testing.assert_allclose(CU3Gate(0, 1, 0, 0, 0).matrix(), np.eye(4), atol=1e-10)
 
     def test_csx_unitary(self):
         assert is_unitary(CSXGate(0, 1).matrix())
@@ -456,14 +455,31 @@ class TestCircuitFluentAPI:
         """All new methods support fluent chaining."""
         c = (
             Circuit(3)
-            .sdg(0).tdg(0).sx(0).sxdg(0)
-            .p(0, 0.5).u1(0, 0.5).u2(0, 0, 0.5).r(0, 0.5, 0)
-            .cy(0, 1).ch(0, 1).cs(0, 1).csdg(0, 1)
-            .crx(0, 1, 0.5).cry(0, 1, 0.5).crz(0, 1, 0.5)
-            .cp(0, 1, 0.5).cu1(0, 1, 0.5).cu3(0, 1, 0.5, 0, 0)
+            .sdg(0)
+            .tdg(0)
+            .sx(0)
+            .sxdg(0)
+            .p(0, 0.5)
+            .u1(0, 0.5)
+            .u2(0, 0, 0.5)
+            .r(0, 0.5, 0)
+            .cy(0, 1)
+            .ch(0, 1)
+            .cs(0, 1)
+            .csdg(0, 1)
+            .crx(0, 1, 0.5)
+            .cry(0, 1, 0.5)
+            .crz(0, 1, 0.5)
+            .cp(0, 1, 0.5)
+            .cu1(0, 1, 0.5)
+            .cu3(0, 1, 0.5, 0, 0)
             .csx(0, 1)
-            .rxx(0, 1, 0.5).ryy(0, 1, 0.5).rzx(0, 1, 0.5)
-            .iswap(0, 1).dcx(0, 1).ecr(0, 1)
+            .rxx(0, 1, 0.5)
+            .ryy(0, 1, 0.5)
+            .rzx(0, 1, 0.5)
+            .iswap(0, 1)
+            .dcx(0, 1)
+            .ecr(0, 1)
             .ccz(0, 1, 2)
             .reset(0)
         )
@@ -479,6 +495,7 @@ class TestSimulationWithNewGates:
     def test_sdg_simulation(self):
         """S followed by Sdg should give back |0>."""
         import quantsdk as qs
+
         c = qs.Circuit(1).s(0).sdg(0).measure_all()
         result = qs.run(c, shots=100, seed=42)
         assert result.counts.get("0", 0) == 100
@@ -486,6 +503,7 @@ class TestSimulationWithNewGates:
     def test_sx_simulation(self):
         """SX twice should be X (flip |0> to |1>)."""
         import quantsdk as qs
+
         c = qs.Circuit(1).sx(0).sx(0).measure_all()
         result = qs.run(c, shots=100, seed=42)
         assert result.counts.get("1", 0) == 100
@@ -493,6 +511,7 @@ class TestSimulationWithNewGates:
     def test_phase_gate_simulation(self):
         """P(pi) on |+> should give |->  (measure ~50/50 still)."""
         import quantsdk as qs
+
         c = qs.Circuit(1).h(0).p(0, math.pi).h(0).measure_all()
         result = qs.run(c, shots=100, seed=42)
         # H P(pi) H = X, so should measure |1>
@@ -501,6 +520,7 @@ class TestSimulationWithNewGates:
     def test_cy_simulation(self):
         """CY with control=|1> should flip target."""
         import quantsdk as qs
+
         c = qs.Circuit(2).x(0).cy(0, 1).measure_all()
         result = qs.run(c, shots=100, seed=42)
         # After X|0> -> |1>, CY flips target: result should be |1,1> = "11"
@@ -510,6 +530,7 @@ class TestSimulationWithNewGates:
     def test_iswap_simulation(self):
         """iSWAP on |10> should give i|01>."""
         import quantsdk as qs
+
         c = qs.Circuit(2).x(0).iswap(0, 1).measure_all()
         result = qs.run(c, shots=100, seed=42)
         assert result.counts.get("01", 0) == 100
@@ -517,6 +538,7 @@ class TestSimulationWithNewGates:
     def test_ccz_simulation(self):
         """CCZ on |111> should add -1 phase (measure still |111>)."""
         import quantsdk as qs
+
         c = qs.Circuit(3).x(0).x(1).x(2).ccz(0, 1, 2).measure_all()
         result = qs.run(c, shots=100, seed=42)
         assert result.counts.get("111", 0) == 100
@@ -524,6 +546,7 @@ class TestSimulationWithNewGates:
     def test_reset_simulation(self):
         """Reset should bring qubit back to |0>."""
         import quantsdk as qs
+
         c = qs.Circuit(1).x(0).reset(0).measure_all()
         result = qs.run(c, shots=100, seed=42)
         assert result.counts.get("0", 0) == 100
@@ -531,6 +554,7 @@ class TestSimulationWithNewGates:
     def test_reset_entangled(self):
         """Reset one qubit of an entangled pair."""
         import quantsdk as qs
+
         c = qs.Circuit(2).h(0).cx(0, 1).reset(0).measure_all()
         result = qs.run(c, shots=1000, seed=42)
         # After reset qubit 0, qubit 0 is |0>, qubit 1 is 50/50
@@ -546,6 +570,7 @@ class TestOpenQASMNewGates:
 
     def test_sdg_roundtrip(self):
         from quantsdk.interop.openqasm import from_openqasm, to_openqasm
+
         c = Circuit(1).sdg(0)
         qasm = to_openqasm(c)
         assert "sdg" in qasm
@@ -554,6 +579,7 @@ class TestOpenQASMNewGates:
 
     def test_phase_roundtrip(self):
         from quantsdk.interop.openqasm import from_openqasm, to_openqasm
+
         c = Circuit(1).p(0, math.pi / 4)
         qasm = to_openqasm(c)
         assert "p(" in qasm
@@ -563,6 +589,7 @@ class TestOpenQASMNewGates:
 
     def test_crz_roundtrip(self):
         from quantsdk.interop.openqasm import from_openqasm, to_openqasm
+
         c = Circuit(2).crz(0, 1, math.pi / 2)
         qasm = to_openqasm(c)
         assert "crz(" in qasm
@@ -571,6 +598,7 @@ class TestOpenQASMNewGates:
 
     def test_ccz_roundtrip(self):
         from quantsdk.interop.openqasm import from_openqasm, to_openqasm
+
         c = Circuit(3).ccz(0, 1, 2)
         qasm = to_openqasm(c)
         assert "ccz" in qasm
@@ -579,6 +607,7 @@ class TestOpenQASMNewGates:
 
     def test_reset_roundtrip(self):
         from quantsdk.interop.openqasm import from_openqasm, to_openqasm
+
         c = Circuit(1)
         c.x(0)
         c.reset(0)
@@ -589,6 +618,7 @@ class TestOpenQASMNewGates:
 
     def test_iswap_roundtrip(self):
         from quantsdk.interop.openqasm import from_openqasm, to_openqasm
+
         c = Circuit(2).iswap(0, 1)
         qasm = to_openqasm(c)
         assert "iswap" in qasm
@@ -598,6 +628,7 @@ class TestOpenQASMNewGates:
     def test_complex_circuit_roundtrip(self):
         """Test a circuit with many new gates round-trips through OpenQASM."""
         from quantsdk.interop.openqasm import from_openqasm, to_openqasm
+
         c = Circuit(3)
         c.sdg(0).tdg(1).sx(0).p(0, 0.5)
         c.cy(0, 1).crx(0, 1, 0.7)

@@ -373,7 +373,9 @@ class TestSafeParamParsing:
 
     def test_rejects_open(self):
         """open() must be rejected."""
-        qasm = 'OPENQASM 2.0;\ninclude "qelib1.inc";\nqreg q[1];\nrx(open("/etc/passwd").read()) q[0];'
+        qasm = (
+            'OPENQASM 2.0;\ninclude "qelib1.inc";\nqreg q[1];\nrx(open("/etc/passwd").read()) q[0];'
+        )
         with pytest.raises(ValueError):
             from_openqasm(qasm)
 

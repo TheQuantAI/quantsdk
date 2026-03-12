@@ -50,13 +50,52 @@ class LocalSimulator(Backend):
             status=BackendStatus.ONLINE,
             is_simulator=True,
             native_gates=frozenset(
-                ["H", "X", "Y", "Z", "S", "Sdg", "T", "Tdg", "SX", "SXdg", "I",
-                 "RX", "RY", "RZ", "U3", "P", "U1", "U2", "R",
-                 "CX", "CZ", "CY", "CH", "CS", "CSdg",
-                 "CRX", "CRY", "CRZ", "CP", "CU1", "CU3", "CSX",
-                 "SWAP", "iSWAP", "DCX", "ECR",
-                 "RZZ", "RXX", "RYY", "RZX",
-                 "CCX", "CCZ", "CSWAP", "RESET"]
+                [
+                    "H",
+                    "X",
+                    "Y",
+                    "Z",
+                    "S",
+                    "Sdg",
+                    "T",
+                    "Tdg",
+                    "SX",
+                    "SXdg",
+                    "I",
+                    "RX",
+                    "RY",
+                    "RZ",
+                    "U3",
+                    "P",
+                    "U1",
+                    "U2",
+                    "R",
+                    "CX",
+                    "CZ",
+                    "CY",
+                    "CH",
+                    "CS",
+                    "CSdg",
+                    "CRX",
+                    "CRY",
+                    "CRZ",
+                    "CP",
+                    "CU1",
+                    "CU3",
+                    "CSX",
+                    "SWAP",
+                    "iSWAP",
+                    "DCX",
+                    "ECR",
+                    "RZZ",
+                    "RXX",
+                    "RYY",
+                    "RZX",
+                    "CCX",
+                    "CCZ",
+                    "CSWAP",
+                    "RESET",
+                ]
             ),
             max_shots=1_000_000,
             queue_depth=0,
@@ -167,7 +206,8 @@ class LocalSimulator(Backend):
         sv = np.tensordot(matrix, sv, axes=([1], [qubit]))
         # Move the new axis back to the correct position
         sv = np.moveaxis(sv, 0, qubit)
-        return sv.reshape(2**n)
+        result: np.ndarray = sv.reshape(2**n)
+        return result
 
     def _apply_two_qubit_gate(
         self, sv: np.ndarray, matrix: np.ndarray, q0: int, q1: int, n: int
@@ -180,7 +220,8 @@ class LocalSimulator(Backend):
         # Move axes back: the result has the two new axes at positions 0, 1
         # We need to move them to q0 and q1
         sv = np.moveaxis(sv, [0, 1], sorted([q0, q1]))
-        return sv.reshape(2**n)
+        result: np.ndarray = sv.reshape(2**n)
+        return result
 
     def _apply_multi_qubit_gate(
         self, sv: np.ndarray, matrix: np.ndarray, qubits: list[int], n: int
@@ -194,7 +235,8 @@ class LocalSimulator(Backend):
         sv = np.tensordot(matrix_reshaped, sv, axes=(contraction_axes, qubits))
         # Move axes back
         sv = np.moveaxis(sv, list(range(k)), sorted(qubits))
-        return sv.reshape(2**n)
+        result: np.ndarray = sv.reshape(2**n)
+        return result
 
     def _apply_reset(
         self, sv: np.ndarray, qubit: int, n: int, rng: np.random.Generator
@@ -225,4 +267,5 @@ class LocalSimulator(Backend):
         norm = np.linalg.norm(sv)
         if norm > 1e-12:
             sv = sv / norm
-        return sv.reshape(2**n)
+        result: np.ndarray = sv.reshape(2**n)
+        return result
