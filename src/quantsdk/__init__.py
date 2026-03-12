@@ -19,7 +19,12 @@ Quick Start::
     print(result.counts)  # {'00': 503, '11': 497}
 """
 
-__version__ = "0.1.0-dev"
+from importlib.metadata import PackageNotFoundError, version as _version
+
+try:
+    __version__ = _version("quantsdk")
+except PackageNotFoundError:  # pragma: no cover — editable / dev installs
+    __version__ = "0.1.0"
 
 from quantsdk.circuit import Circuit
 from quantsdk.result import Result

@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "quantsdk"
-version = "0.1.0-dev"
+version = "0.1.0"
 description = "Write quantum code once, run anywhere. A framework-agnostic quantum computing SDK."
 readme = "README.md"
 license = { text = "Apache-2.0" }
@@ -77,6 +77,16 @@ Issues = "https://github.com/TheQuantAI/quantsdk/issues"
 Changelog = "https://github.com/TheQuantAI/quantsdk/blob/main/CHANGELOG.md"
 
 # ─── Tool Configuration ───
+
+[tool.hatch.build.targets.sdist]
+include = [
+    "src/quantsdk/",
+    "tests/",
+    "LICENSE",
+    "README.md",
+    "CHANGELOG.md",
+    "pyproject.toml",
+]
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/quantsdk"]
