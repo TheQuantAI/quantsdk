@@ -121,6 +121,15 @@ class IBMBackend(Backend):
             )
             logger.info("Auto-selected backend: %s", self._qiskit_backend.name)
 
+    def __repr__(self) -> str:
+        """Return a string representation with the token masked."""
+        masked = "****" + self._token[-4:] if self._token and len(self._token) >= 4 else "****"
+        return (
+            f"IBMBackend(token='{masked}', "
+            f"backend='{self._qiskit_backend.name}', "
+            f"instance='{self._instance}')"
+        )
+
     def run(self, circuit: Circuit, shots: int = 4096, **options: Any) -> Result:
         """Execute a circuit on IBM Quantum hardware.
 

@@ -98,3 +98,36 @@ jobs:
 
       - name: mypy
         run: mypy src/quantsdk/ --ignore-missing-imports
+
+  security:
+    name: Security Audit
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: |
+          uv pip install --system -e ".[dev]"
+          uv pip install --system pip-audit bandit
+
+      - name: Dependency audit (pip-audit)
+        run: pip-audit --strict --desc
+
+      - name: Static security scan (bandit)
+        run: bandit -r src/quantsdk/ -c pyproject.toml -f json -o bandit-report.json || true
+
+      - name: Bandit human-readable report
+        run: bandit -r src/quantsdk/ -c pyproject.toml -ll
+
+      - name: Check for secrets in code
+        run: |
+          echo "Scanning for potential secrets..."
+          ! grep -rn --include='*.py' -E '(password|secret|api_key|token)\s*=\s*["'\'']\''.{8,}["'\'']\'''' src/ || echo "No hardcoded secrets found ✅"

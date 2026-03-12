@@ -25,6 +25,13 @@ ENV/
 *.swo
 *~
 
+# Environment / Secrets
+.env
+.env.*
+.env.local
+*.pem
+*.key
+
 # OS
 .DS_Store
 Thumbs.db

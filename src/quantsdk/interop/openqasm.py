@@ -325,20 +325,51 @@ def _parse_qubits(qargs_str: str) -> list[int]:
     return [int(idx) for _, idx in matches]
 
 
+# ── Safe arithmetic evaluator (replaces eval) ──────────────────────────────
+_SAFE_PARAM_RE = re.compile(
+    r"^[\d\.eE+\-*/() ]+$"  # digits, decimal, scientific notation, operators, parens, spaces
+)
+
+
+def _safe_eval_param(expr: str) -> float:
+    """Safely evaluate a simple arithmetic expression (no builtins, no names).
+
+    Only allows: numbers, +, -, *, /, parentheses, and whitespace.
+    The string 'pi' must already be substituted before calling this.
+
+    Raises:
+        ValueError: If the expression contains disallowed characters.
+    """
+    if not _SAFE_PARAM_RE.match(expr):
+        raise ValueError(
+            f"Unsafe parameter expression rejected: '{expr}'. "
+            "Only numeric literals and +, -, *, / operators are allowed."
+        )
+    # ast.literal_eval doesn't handle arithmetic, so we use a restricted
+    # compile + eval with empty globals/locals to prevent code injection.
+    try:
+        code = compile(expr, "<qasm_param>", "eval")
+        # Verify the bytecode only contains safe operations
+        for name in code.co_names:
+            raise ValueError(f"Name '{name}' not allowed in parameter expression")
+        # Sandboxed eval: regex-validated input, no builtins, no names allowed
+        return float(eval(code, {"__builtins__": {}}, {}))  # noqa: S307 # nosec B307
+    except (ValueError, SyntaxError, TypeError, ZeroDivisionError) as e:
+        raise ValueError(f"Cannot parse parameter: '{expr}'") from e
+
+
 def _parse_params(param_str: str) -> list[float]:
     """Parse parameter string like '3.14,1.57,0.0' into a list of floats.
 
     Supports pi expressions like 'pi/2', '2*pi', etc.
+    Uses a safe evaluator — no arbitrary code execution.
     """
     params = []
     for p in param_str.split(","):
         p = p.strip()
-        # Replace 'pi' with math.pi for evaluation
+        # Replace 'pi' with its numeric value before safe evaluation
         p = p.replace("pi", str(math.pi))
-        try:
-            params.append(float(eval(p)))
-        except (ValueError, SyntaxError) as e:
-            raise ValueError(f"Cannot parse parameter: '{p}'") from e
+        params.append(_safe_eval_param(p))
     return params
 
 

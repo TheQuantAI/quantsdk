@@ -336,3 +336,85 @@ class TestRoundTripQASM:
             if orig.params:
                 for p1, p2 in zip(orig.params, rest.params, strict=True):
                     assert p1 == pytest.approx(p2)
+
+
+class TestSafeParamParsing:
+    """Security tests: ensure QASM parameter parsing rejects code injection."""
+
+    def test_simple_number(self):
+        """Plain numbers should parse fine."""
+        qasm = 'OPENQASM 2.0;\ninclude "qelib1.inc";\nqreg q[1];\nrx(1.5707963) q[0];'
+        c = from_openqasm(qasm)
+        assert c.gates[0].params[0] == pytest.approx(1.5707963)
+
+    def test_pi_expression(self):
+        """pi/2 should be handled safely."""
+        qasm = 'OPENQASM 2.0;\ninclude "qelib1.inc";\nqreg q[1];\nrx(pi/2) q[0];'
+        c = from_openqasm(qasm)
+        assert c.gates[0].params[0] == pytest.approx(math.pi / 2)
+
+    def test_negative_pi(self):
+        """-pi should work."""
+        qasm = 'OPENQASM 2.0;\ninclude "qelib1.inc";\nqreg q[1];\nrx(-pi) q[0];'
+        c = from_openqasm(qasm)
+        assert c.gates[0].params[0] == pytest.approx(-math.pi)
+
+    def test_rejects_import(self):
+        """__import__('os') must be rejected."""
+        qasm = 'OPENQASM 2.0;\ninclude "qelib1.inc";\nqreg q[1];\nrx(__import__("os").system("echo pwned")) q[0];'
+        with pytest.raises(ValueError):
+            from_openqasm(qasm)
+
+    def test_rejects_exec(self):
+        """exec() must be rejected."""
+        qasm = 'OPENQASM 2.0;\ninclude "qelib1.inc";\nqreg q[1];\nrx(exec("import os")) q[0];'
+        with pytest.raises(ValueError):
+            from_openqasm(qasm)
+
+    def test_rejects_open(self):
+        """open() must be rejected."""
+        qasm = 'OPENQASM 2.0;\ninclude "qelib1.inc";\nqreg q[1];\nrx(open("/etc/passwd").read()) q[0];'
+        with pytest.raises(ValueError):
+            from_openqasm(qasm)
+
+    def test_rejects_dunder_builtins(self):
+        """__builtins__ access must be rejected."""
+        qasm = 'OPENQASM 2.0;\ninclude "qelib1.inc";\nqreg q[1];\nrx(__builtins__) q[0];'
+        with pytest.raises(ValueError, match="Unsafe parameter expression rejected"):
+            from_openqasm(qasm)
+
+    def test_rejects_arbitrary_string(self):
+        """Arbitrary strings must be rejected."""
+        qasm = 'OPENQASM 2.0;\ninclude "qelib1.inc";\nqreg q[1];\nrx(malicious_func()) q[0];'
+        with pytest.raises(ValueError):
+            from_openqasm(qasm)
+
+    def test_arithmetic_expression(self):
+        """Safe arithmetic like 2*3.14/4 should work."""
+        qasm = 'OPENQASM 2.0;\ninclude "qelib1.inc";\nqreg q[1];\nrx(2*pi/4) q[0];'
+        c = from_openqasm(qasm)
+        assert c.gates[0].params[0] == pytest.approx(math.pi / 2)
+
+    def test_safe_eval_rejects_names_directly(self):
+        """Direct test of _safe_eval_param to ensure name-based attacks fail."""
+        from quantsdk.interop.openqasm import _safe_eval_param
+
+        # Valid expressions
+        assert _safe_eval_param("3.14") == pytest.approx(3.14)
+        assert _safe_eval_param("1 + 2") == pytest.approx(3.0)
+        assert _safe_eval_param("2 * 3.0 / 4") == pytest.approx(1.5)
+        assert _safe_eval_param("-1.5") == pytest.approx(-1.5)
+        assert _safe_eval_param("(1 + 2) * 3") == pytest.approx(9.0)
+
+        # Malicious expressions must be rejected by regex
+        for malicious in [
+            "__import__('os')",
+            "open('/etc/passwd')",
+            "exec('code')",
+            "eval('1+1')",
+            "os.system('ls')",
+            "lambda: None",
+            "a = 1",
+        ]:
+            with pytest.raises(ValueError, match="Unsafe parameter expression rejected"):
+                _safe_eval_param(malicious)
