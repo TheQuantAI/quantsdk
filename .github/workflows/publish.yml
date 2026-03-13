@@ -95,6 +95,8 @@ jobs:
     name: Test installation (Python ${{ matrix.python-version }}, ${{ matrix.os }})
     needs: build
     runs-on: ${{ matrix.os }}
+    env:
+      PYTHONIOENCODING: utf-8
     strategy:
       fail-fast: false
       matrix:
