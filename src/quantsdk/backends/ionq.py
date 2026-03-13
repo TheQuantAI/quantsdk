@@ -51,9 +51,23 @@ _IONQ_DEVICE_ARNS: dict[str, str] = {
 }
 
 # IonQ native gate set (GPI, GPI2, MS)
-_IONQ_NATIVE_GATES: frozenset[str] = frozenset({
-    "gpi", "gpi2", "ms", "x", "y", "z", "h", "cx", "s", "t", "rx", "ry", "rz",
-})
+_IONQ_NATIVE_GATES: frozenset[str] = frozenset(
+    {
+        "gpi",
+        "gpi2",
+        "ms",
+        "x",
+        "y",
+        "z",
+        "h",
+        "cx",
+        "s",
+        "t",
+        "rx",
+        "ry",
+        "rz",
+    }
+)
 
 
 def _check_braket() -> None:
@@ -206,9 +220,7 @@ class IonQBackend(Backend):
         try:
             properties = self._device.properties
             num_qubits = getattr(properties, "paradigm", None)
-            qubit_count = (
-                num_qubits.qubitCount if num_qubits is not None else 11
-            )
+            qubit_count = num_qubits.qubitCount if num_qubits is not None else 11
         except Exception:
             qubit_count = 11  # Default for IonQ Harmony
 
@@ -510,4 +522,3 @@ class BraketLocalBackend(Backend):
             queue_depth=0,
             metadata={"backend": self._backend_name},
         )
-

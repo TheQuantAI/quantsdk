@@ -73,8 +73,7 @@ def _check_cirq() -> None:
         import cirq as _cirq  # noqa: F401
     except ImportError as e:
         raise ImportError(
-            "Cirq is required for Cirq interop. "
-            "Install it with: pip install quantsdk[interop]"
+            "Cirq is required for Cirq interop. Install it with: pip install quantsdk[interop]"
         ) from e
 
 
@@ -403,9 +402,7 @@ def _cirq_op_to_quantsdk(
             ctrl, tgt = indices
             _handle_controlled_gate(sub_gate, ctrl, tgt, circuit, cq)
             return
-        raise ValueError(
-            f"Unsupported controlled gate with {num_controls} controls: {gate}"
-        )
+        raise ValueError(f"Unsupported controlled gate with {num_controls} controls: {gate}")
 
     # ── HPowGate ──
     if isinstance(gate, cq.HPowGate):
@@ -558,9 +555,7 @@ def _cirq_op_to_quantsdk(
             theta, phi, lam = _unitary_to_u3(mat)
             circuit._gates.append(U3Gate(indices[0], theta, phi, lam))
             return
-        raise ValueError(
-            f"Cannot import multi-qubit MatrixGate back to QuantSDK: {gate}"
-        )
+        raise ValueError(f"Cannot import multi-qubit MatrixGate back to QuantSDK: {gate}")
 
     raise ValueError(f"Unsupported Cirq gate type for QuantSDK import: {type(gate).__name__}")
 
@@ -579,8 +574,10 @@ def _handle_controlled_gate(
         return
 
     # Y → CY
-    if isinstance(sub_gate, cq.YPowGate) and _is_close(sub_gate.exponent, 1) and _is_close(
-        sub_gate.global_shift, 0
+    if (
+        isinstance(sub_gate, cq.YPowGate)
+        and _is_close(sub_gate.exponent, 1)
+        and _is_close(sub_gate.global_shift, 0)
     ):
         circuit._gates.append(CYGate(ctrl, tgt))
         return
@@ -605,8 +602,10 @@ def _handle_controlled_gate(
         return
 
     # XPowGate exp=0.5 → CSX
-    if isinstance(sub_gate, cq.XPowGate) and _is_close(sub_gate.exponent, 0.5) and _is_close(
-        sub_gate.global_shift, 0
+    if (
+        isinstance(sub_gate, cq.XPowGate)
+        and _is_close(sub_gate.exponent, 0.5)
+        and _is_close(sub_gate.global_shift, 0)
     ):
         circuit._gates.append(CSXGate(ctrl, tgt))
         return

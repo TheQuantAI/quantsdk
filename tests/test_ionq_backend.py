@@ -299,16 +299,7 @@ class TestBraketLocalBackend:
 
     def test_multi_gate_circuit(self) -> None:
         """Complex circuit with multiple gate types."""
-        circuit = (
-            Circuit(3)
-            .h(0)
-            .cx(0, 1)
-            .s(1)
-            .t(2)
-            .rx(2, math.pi / 2)
-            .cz(0, 2)
-            .measure_all()
-        )
+        circuit = Circuit(3).h(0).cx(0, 1).s(1).t(2).rx(2, math.pi / 2).cz(0, 2).measure_all()
         backend = BraketLocalBackend()
         result = backend.run(circuit, shots=1000)
         assert sum(result.counts.values()) == 1000
@@ -410,8 +401,9 @@ class TestCheckBraket:
 
     def test_check_braket_fails_gracefully(self) -> None:
         """Should raise ImportError with helpful message when braket missing."""
-        with patch.dict("sys.modules", {"braket": None}), pytest.raises(
-            ImportError, match="Amazon Braket SDK"
+        with (
+            patch.dict("sys.modules", {"braket": None}),
+            pytest.raises(ImportError, match="Amazon Braket SDK"),
         ):
             _check_braket()
 
@@ -535,9 +527,7 @@ class TestIonQBackend:
         mock_task = MagicMock()
         mock_task.id = "task-456"
         mock_task.state.return_value = "COMPLETED"
-        mock_task.result.return_value = MagicMock(
-            measurement_counts=Counter({"0": 1000})
-        )
+        mock_task.result.return_value = MagicMock(measurement_counts=Counter({"0": 1000}))
 
         mock_device = MagicMock()
         mock_device.run.return_value = mock_task
@@ -556,17 +546,13 @@ class TestIonQBackend:
         assert result.shots == 1000
 
     @patch("quantsdk.backends.ionq._get_aws_device")
-    def test_run_with_disable_qubit_rewiring(
-        self, mock_device_cls: MagicMock
-    ) -> None:
+    def test_run_with_disable_qubit_rewiring(self, mock_device_cls: MagicMock) -> None:
         from collections import Counter
 
         mock_task = MagicMock()
         mock_task.id = "task-789"
         mock_task.state.return_value = "COMPLETED"
-        mock_task.result.return_value = MagicMock(
-            measurement_counts=Counter({"1": 100})
-        )
+        mock_task.result.return_value = MagicMock(measurement_counts=Counter({"1": 100}))
 
         mock_device = MagicMock()
         mock_device.run.return_value = mock_task
@@ -581,17 +567,13 @@ class TestIonQBackend:
         assert result.shots == 100
 
     @patch("quantsdk.backends.ionq._get_aws_device")
-    def test_result_metadata_has_device_info(
-        self, mock_device_cls: MagicMock
-    ) -> None:
+    def test_result_metadata_has_device_info(self, mock_device_cls: MagicMock) -> None:
         from collections import Counter
 
         mock_task = MagicMock()
         mock_task.id = "task-meta"
         mock_task.state.return_value = "COMPLETED"
-        mock_task.result.return_value = MagicMock(
-            measurement_counts=Counter({"0": 100})
-        )
+        mock_task.result.return_value = MagicMock(measurement_counts=Counter({"0": 100}))
 
         mock_device = MagicMock()
         mock_device.run.return_value = mock_task
@@ -708,7 +690,8 @@ class TestImportGuard:
     """Test that missing braket gives a clear error."""
 
     def test_braket_import_error_message(self) -> None:
-        with patch.dict("sys.modules", {"braket": None}), pytest.raises(
-            ImportError, match="quantsdk\\[ionq\\]"
+        with (
+            patch.dict("sys.modules", {"braket": None}),
+            pytest.raises(ImportError, match="quantsdk\\[ionq\\]"),
         ):
             _check_braket()

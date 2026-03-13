@@ -253,10 +253,12 @@ class TestFromPennylane:
 
     def test_bell_state(self) -> None:
         """Import a Bell state from PennyLane."""
-        tape = _make_tape([
-            qml.Hadamard(wires=0),
-            qml.CNOT(wires=[0, 1]),
-        ])
+        tape = _make_tape(
+            [
+                qml.Hadamard(wires=0),
+                qml.CNOT(wires=[0, 1]),
+            ]
+        )
         c = from_pennylane(tape)
         assert c.num_qubits == 2
         assert isinstance(c.gates[0], HGate)
@@ -264,15 +266,17 @@ class TestFromPennylane:
 
     def test_single_qubit_gates(self) -> None:
         """Standard single-qubit gates import."""
-        tape = _make_tape([
-            qml.Hadamard(wires=0),
-            qml.PauliX(wires=0),
-            qml.PauliY(wires=0),
-            qml.PauliZ(wires=0),
-            qml.S(wires=0),
-            qml.T(wires=0),
-            qml.Identity(wires=0),
-        ])
+        tape = _make_tape(
+            [
+                qml.Hadamard(wires=0),
+                qml.PauliX(wires=0),
+                qml.PauliY(wires=0),
+                qml.PauliZ(wires=0),
+                qml.S(wires=0),
+                qml.T(wires=0),
+                qml.Identity(wires=0),
+            ]
+        )
         c = from_pennylane(tape)
         gate_types = [type(g) for g in c.gates if not isinstance(g, Measure)]
         assert gate_types == [HGate, XGate, YGate, ZGate, SGate, TGate, IGate]
@@ -285,10 +289,12 @@ class TestFromPennylane:
 
     def test_adjoint_s_and_t(self) -> None:
         """Adjoint(S) -> SdgGate, Adjoint(T) -> TdgGate."""
-        tape = _make_tape([
-            qml.adjoint(qml.S(wires=0)),
-            qml.adjoint(qml.T(wires=0)),
-        ])
+        tape = _make_tape(
+            [
+                qml.adjoint(qml.S(wires=0)),
+                qml.adjoint(qml.T(wires=0)),
+            ]
+        )
         c = from_pennylane(tape)
         non_meas = [g for g in c.gates if not isinstance(g, Measure)]
         assert isinstance(non_meas[0], SdgGate)
@@ -305,11 +311,13 @@ class TestFromPennylane:
 
     def test_parametric_gates(self) -> None:
         """RX, RY, RZ import with correct angles."""
-        tape = _make_tape([
-            qml.RX(math.pi / 4, wires=0),
-            qml.RY(math.pi / 3, wires=0),
-            qml.RZ(math.pi / 2, wires=0),
-        ])
+        tape = _make_tape(
+            [
+                qml.RX(math.pi / 4, wires=0),
+                qml.RY(math.pi / 3, wires=0),
+                qml.RZ(math.pi / 2, wires=0),
+            ]
+        )
         c = from_pennylane(tape)
         non_meas = [g for g in c.gates if not isinstance(g, Measure)]
         assert isinstance(non_meas[0], RXGate)
@@ -327,11 +335,13 @@ class TestFromPennylane:
 
     def test_u1_u2_u3(self) -> None:
         """U1, U2, U3 import."""
-        tape = _make_tape([
-            qml.U1(0.5, wires=0),
-            qml.U2(0.5, 0.7, wires=0),
-            qml.U3(1.0, 2.0, 3.0, wires=0),
-        ])
+        tape = _make_tape(
+            [
+                qml.U1(0.5, wires=0),
+                qml.U2(0.5, 0.7, wires=0),
+                qml.U3(1.0, 2.0, 3.0, wires=0),
+            ]
+        )
         c = from_pennylane(tape)
         non_meas = [g for g in c.gates if not isinstance(g, Measure)]
         assert isinstance(non_meas[0], U1Gate)
@@ -341,11 +351,13 @@ class TestFromPennylane:
 
     def test_two_qubit_gates(self) -> None:
         """CX, CZ, SWAP import."""
-        tape = _make_tape([
-            qml.CNOT(wires=[0, 1]),
-            qml.CZ(wires=[0, 1]),
-            qml.SWAP(wires=[0, 1]),
-        ])
+        tape = _make_tape(
+            [
+                qml.CNOT(wires=[0, 1]),
+                qml.CZ(wires=[0, 1]),
+                qml.SWAP(wires=[0, 1]),
+            ]
+        )
         c = from_pennylane(tape)
         non_meas = [g for g in c.gates if not isinstance(g, Measure)]
         gate_types = [type(g) for g in non_meas]
@@ -353,10 +365,12 @@ class TestFromPennylane:
 
     def test_cy_ch(self) -> None:
         """CY, CH import."""
-        tape = _make_tape([
-            qml.CY(wires=[0, 1]),
-            qml.CH(wires=[0, 1]),
-        ])
+        tape = _make_tape(
+            [
+                qml.CY(wires=[0, 1]),
+                qml.CH(wires=[0, 1]),
+            ]
+        )
         c = from_pennylane(tape)
         non_meas = [g for g in c.gates if not isinstance(g, Measure)]
         assert isinstance(non_meas[0], CYGate)
@@ -378,11 +392,13 @@ class TestFromPennylane:
 
     def test_controlled_rotations(self) -> None:
         """CRX, CRY, CRZ import."""
-        tape = _make_tape([
-            qml.CRX(math.pi / 4, wires=[0, 1]),
-            qml.CRY(math.pi / 3, wires=[0, 1]),
-            qml.CRZ(math.pi / 2, wires=[0, 1]),
-        ])
+        tape = _make_tape(
+            [
+                qml.CRX(math.pi / 4, wires=[0, 1]),
+                qml.CRY(math.pi / 3, wires=[0, 1]),
+                qml.CRZ(math.pi / 2, wires=[0, 1]),
+            ]
+        )
         c = from_pennylane(tape)
         non_meas = [g for g in c.gates if not isinstance(g, Measure)]
         assert isinstance(non_meas[0], CRXGate)
@@ -399,11 +415,13 @@ class TestFromPennylane:
 
     def test_ising_gates(self) -> None:
         """IsingXX, IsingYY, IsingZZ import as RXX, RYY, RZZ."""
-        tape = _make_tape([
-            qml.IsingXX(0.5, wires=[0, 1]),
-            qml.IsingYY(0.3, wires=[0, 1]),
-            qml.IsingZZ(0.7, wires=[0, 1]),
-        ])
+        tape = _make_tape(
+            [
+                qml.IsingXX(0.5, wires=[0, 1]),
+                qml.IsingYY(0.3, wires=[0, 1]),
+                qml.IsingZZ(0.7, wires=[0, 1]),
+            ]
+        )
         c = from_pennylane(tape)
         non_meas = [g for g in c.gates if not isinstance(g, Measure)]
         assert isinstance(non_meas[0], RXXGate)
@@ -412,11 +430,13 @@ class TestFromPennylane:
 
     def test_three_qubit_gates(self) -> None:
         """Toffoli, CSWAP, CCZ import."""
-        tape = _make_tape([
-            qml.Toffoli(wires=[0, 1, 2]),
-            qml.CSWAP(wires=[0, 1, 2]),
-            qml.CCZ(wires=[0, 1, 2]),
-        ])
+        tape = _make_tape(
+            [
+                qml.Toffoli(wires=[0, 1, 2]),
+                qml.CSWAP(wires=[0, 1, 2]),
+                qml.CCZ(wires=[0, 1, 2]),
+            ]
+        )
         c = from_pennylane(tape)
         non_meas = [g for g in c.gates if not isinstance(g, Measure)]
         assert isinstance(non_meas[0], ToffoliGate)
@@ -431,10 +451,12 @@ class TestFromPennylane:
 
     def test_wire_mapping(self) -> None:
         """Non-contiguous wires are remapped."""
-        tape = _make_tape([
-            qml.Hadamard(wires=0),
-            qml.CNOT(wires=[0, 5]),
-        ])
+        tape = _make_tape(
+            [
+                qml.Hadamard(wires=0),
+                qml.CNOT(wires=[0, 5]),
+            ]
+        )
         c = from_pennylane(tape)
         assert c.num_qubits == 2  # wires 0, 5 -> indices 0, 1
         assert c.gates[0].qubits == (0,)

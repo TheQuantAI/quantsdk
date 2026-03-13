@@ -297,11 +297,13 @@ class TestFromCirq:
     def test_bell_state(self) -> None:
         """Import a Bell state from Cirq."""
         q = cirq.LineQubit.range(2)
-        cc = cirq.Circuit([
-            cirq.H(q[0]),
-            cirq.CNOT(q[0], q[1]),
-            cirq.measure(q[0], q[1], key="result"),
-        ])
+        cc = cirq.Circuit(
+            [
+                cirq.H(q[0]),
+                cirq.CNOT(q[0], q[1]),
+                cirq.measure(q[0], q[1], key="result"),
+            ]
+        )
 
         c = from_cirq(cc)
         assert c.num_qubits == 2
@@ -314,15 +316,17 @@ class TestFromCirq:
     def test_single_qubit_gates(self) -> None:
         """Standard single-qubit gates import correctly."""
         q = cirq.LineQubit.range(1)
-        cc = cirq.Circuit([
-            cirq.H(q[0]),
-            cirq.X(q[0]),
-            cirq.Y(q[0]),
-            cirq.Z(q[0]),
-            cirq.S(q[0]),
-            cirq.T(q[0]),
-            cirq.I(q[0]),
-        ])
+        cc = cirq.Circuit(
+            [
+                cirq.H(q[0]),
+                cirq.X(q[0]),
+                cirq.Y(q[0]),
+                cirq.Z(q[0]),
+                cirq.S(q[0]),
+                cirq.T(q[0]),
+                cirq.I(q[0]),
+            ]
+        )
 
         c = from_cirq(cc)
         gate_types = [type(g) for g in c.gates]
@@ -331,10 +335,12 @@ class TestFromCirq:
     def test_sdg_and_tdg(self) -> None:
         """S-dagger and T-dagger import."""
         q = cirq.LineQubit.range(1)
-        cc = cirq.Circuit([
-            (cirq.S**-1)(q[0]),
-            (cirq.T**-1)(q[0]),
-        ])
+        cc = cirq.Circuit(
+            [
+                (cirq.S**-1)(q[0]),
+                (cirq.T**-1)(q[0]),
+            ]
+        )
 
         c = from_cirq(cc)
         assert isinstance(c.gates[0], SdgGate)
@@ -343,20 +349,24 @@ class TestFromCirq:
     def test_sx_gate(self) -> None:
         """SX gate (XPowGate exponent=0.5)."""
         q = cirq.LineQubit.range(1)
-        cc = cirq.Circuit([
-            cirq.XPowGate(exponent=0.5)(q[0]),
-        ])
+        cc = cirq.Circuit(
+            [
+                cirq.XPowGate(exponent=0.5)(q[0]),
+            ]
+        )
         c = from_cirq(cc)
         assert isinstance(c.gates[0], SXGate)
 
     def test_parametric_gates(self) -> None:
         """RX, RY, RZ import with correct angles."""
         q = cirq.LineQubit.range(1)
-        cc = cirq.Circuit([
-            cirq.rx(math.pi / 4)(q[0]),
-            cirq.ry(math.pi / 3)(q[0]),
-            cirq.rz(math.pi / 2)(q[0]),
-        ])
+        cc = cirq.Circuit(
+            [
+                cirq.rx(math.pi / 4)(q[0]),
+                cirq.ry(math.pi / 3)(q[0]),
+                cirq.rz(math.pi / 2)(q[0]),
+            ]
+        )
 
         c = from_cirq(cc)
         assert isinstance(c.gates[0], RXGate)
@@ -369,9 +379,11 @@ class TestFromCirq:
     def test_phase_gate_import(self) -> None:
         """General ZPowGate imports as PhaseGate."""
         q = cirq.LineQubit.range(1)
-        cc = cirq.Circuit([
-            cirq.ZPowGate(exponent=0.3)(q[0]),
-        ])
+        cc = cirq.Circuit(
+            [
+                cirq.ZPowGate(exponent=0.3)(q[0]),
+            ]
+        )
         c = from_cirq(cc)
         assert isinstance(c.gates[0], PhaseGate)
         assert c.gates[0].params[0] == pytest.approx(0.3 * math.pi)
@@ -379,11 +391,13 @@ class TestFromCirq:
     def test_two_qubit_gates(self) -> None:
         """CX, CZ, SWAP import."""
         q = cirq.LineQubit.range(2)
-        cc = cirq.Circuit([
-            cirq.CNOT(q[0], q[1]),
-            cirq.CZ(q[0], q[1]),
-            cirq.SWAP(q[0], q[1]),
-        ])
+        cc = cirq.Circuit(
+            [
+                cirq.CNOT(q[0], q[1]),
+                cirq.CZ(q[0], q[1]),
+                cirq.SWAP(q[0], q[1]),
+            ]
+        )
 
         c = from_cirq(cc)
         gate_types = [type(g) for g in c.gates]
@@ -407,11 +421,13 @@ class TestFromCirq:
     def test_xx_yy_zz_pow(self) -> None:
         """XXPowGate, YYPowGate, ZZPowGate import as RXX, RYY, RZZ."""
         q = cirq.LineQubit.range(2)
-        cc = cirq.Circuit([
-            cirq.XXPowGate(exponent=0.5)(q[0], q[1]),
-            cirq.YYPowGate(exponent=0.3)(q[0], q[1]),
-            cirq.ZZPowGate(exponent=0.7)(q[0], q[1]),
-        ])
+        cc = cirq.Circuit(
+            [
+                cirq.XXPowGate(exponent=0.5)(q[0], q[1]),
+                cirq.YYPowGate(exponent=0.3)(q[0], q[1]),
+                cirq.ZZPowGate(exponent=0.7)(q[0], q[1]),
+            ]
+        )
         c = from_cirq(cc)
         assert isinstance(c.gates[0], RXXGate)
         assert c.gates[0].params[0] == pytest.approx(0.5 * math.pi)
@@ -423,11 +439,13 @@ class TestFromCirq:
     def test_three_qubit_gates(self) -> None:
         """Toffoli, CCZ, Fredkin import."""
         q = cirq.LineQubit.range(3)
-        cc = cirq.Circuit([
-            cirq.TOFFOLI(q[0], q[1], q[2]),
-            cirq.CCZ(q[0], q[1], q[2]),
-            cirq.FREDKIN(q[0], q[1], q[2]),
-        ])
+        cc = cirq.Circuit(
+            [
+                cirq.TOFFOLI(q[0], q[1], q[2]),
+                cirq.CCZ(q[0], q[1], q[2]),
+                cirq.FREDKIN(q[0], q[1], q[2]),
+            ]
+        )
 
         c = from_cirq(cc)
         assert isinstance(c.gates[0], ToffoliGate)
@@ -437,45 +455,55 @@ class TestFromCirq:
     def test_controlled_h(self) -> None:
         """ControlledGate(H) imports as CHGate."""
         q = cirq.LineQubit.range(2)
-        cc = cirq.Circuit([
-            cirq.ControlledGate(cirq.H)(q[0], q[1]),
-        ])
+        cc = cirq.Circuit(
+            [
+                cirq.ControlledGate(cirq.H)(q[0], q[1]),
+            ]
+        )
         c = from_cirq(cc)
         assert isinstance(c.gates[0], CHGate)
 
     def test_controlled_y(self) -> None:
         """ControlledGate(Y) imports as CYGate."""
         q = cirq.LineQubit.range(2)
-        cc = cirq.Circuit([
-            cirq.ControlledGate(cirq.Y)(q[0], q[1]),
-        ])
+        cc = cirq.Circuit(
+            [
+                cirq.ControlledGate(cirq.Y)(q[0], q[1]),
+            ]
+        )
         c = from_cirq(cc)
         assert isinstance(c.gates[0], CYGate)
 
     def test_controlled_s(self) -> None:
         """ControlledGate(S) imports as CSGate."""
         q = cirq.LineQubit.range(2)
-        cc = cirq.Circuit([
-            cirq.ControlledGate(cirq.S)(q[0], q[1]),
-        ])
+        cc = cirq.Circuit(
+            [
+                cirq.ControlledGate(cirq.S)(q[0], q[1]),
+            ]
+        )
         c = from_cirq(cc)
         assert isinstance(c.gates[0], CSGate)
 
     def test_controlled_sdg(self) -> None:
         """ControlledGate(S**-1) imports as CSdgGate."""
         q = cirq.LineQubit.range(2)
-        cc = cirq.Circuit([
-            cirq.ControlledGate(cirq.S**-1)(q[0], q[1]),
-        ])
+        cc = cirq.Circuit(
+            [
+                cirq.ControlledGate(cirq.S**-1)(q[0], q[1]),
+            ]
+        )
         c = from_cirq(cc)
         assert isinstance(c.gates[0], CSdgGate)
 
     def test_controlled_rx(self) -> None:
         """ControlledGate(rx) imports as CRXGate."""
         q = cirq.LineQubit.range(2)
-        cc = cirq.Circuit([
-            cirq.ControlledGate(cirq.rx(math.pi / 4))(q[0], q[1]),
-        ])
+        cc = cirq.Circuit(
+            [
+                cirq.ControlledGate(cirq.rx(math.pi / 4))(q[0], q[1]),
+            ]
+        )
         c = from_cirq(cc)
         assert isinstance(c.gates[0], CRXGate)
         assert c.gates[0].params[0] == pytest.approx(math.pi / 4)
@@ -483,9 +511,11 @@ class TestFromCirq:
     def test_controlled_ry(self) -> None:
         """ControlledGate(ry) imports as CRYGate."""
         q = cirq.LineQubit.range(2)
-        cc = cirq.Circuit([
-            cirq.ControlledGate(cirq.ry(math.pi / 3))(q[0], q[1]),
-        ])
+        cc = cirq.Circuit(
+            [
+                cirq.ControlledGate(cirq.ry(math.pi / 3))(q[0], q[1]),
+            ]
+        )
         c = from_cirq(cc)
         assert isinstance(c.gates[0], CRYGate)
         assert c.gates[0].params[0] == pytest.approx(math.pi / 3)
@@ -493,9 +523,11 @@ class TestFromCirq:
     def test_controlled_rz(self) -> None:
         """ControlledGate(rz) imports as CRZGate."""
         q = cirq.LineQubit.range(2)
-        cc = cirq.Circuit([
-            cirq.ControlledGate(cirq.rz(math.pi / 2))(q[0], q[1]),
-        ])
+        cc = cirq.Circuit(
+            [
+                cirq.ControlledGate(cirq.rz(math.pi / 2))(q[0], q[1]),
+            ]
+        )
         c = from_cirq(cc)
         assert isinstance(c.gates[0], CRZGate)
         assert c.gates[0].params[0] == pytest.approx(math.pi / 2)
@@ -503,9 +535,11 @@ class TestFromCirq:
     def test_controlled_sx(self) -> None:
         """ControlledGate(XPowGate(0.5)) imports as CSXGate."""
         q = cirq.LineQubit.range(2)
-        cc = cirq.Circuit([
-            cirq.ControlledGate(cirq.XPowGate(exponent=0.5))(q[0], q[1]),
-        ])
+        cc = cirq.Circuit(
+            [
+                cirq.ControlledGate(cirq.XPowGate(exponent=0.5))(q[0], q[1]),
+            ]
+        )
         c = from_cirq(cc)
         assert isinstance(c.gates[0], CSXGate)
 
