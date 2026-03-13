@@ -18,8 +18,45 @@ permissions:
   contents: read
 
 jobs:
+  # ── 1. Verify the release tag matches pyproject.toml version ──────────────
+  verify-version:
+    name: Verify version tag
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.get_version.outputs.version }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Extract version from pyproject.toml
+        id: get_version
+        run: |
+          VERSION=$(python -c "
+          import re, pathlib
+          text = pathlib.Path('pyproject.toml').read_text()
+          match = re.search(r'^version\s*=\s*\"([^\"]+)\"', text, re.MULTILINE)
+          print(match.group(1))
+          ")
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+          echo "📦 Package version: $VERSION"
+
+      - name: Verify tag matches version (release only)
+        if: github.event_name == 'release'
+        env:
+          TAG: ${{ github.event.release.tag_name }}
+          VERSION: ${{ steps.get_version.outputs.version }}
+        run: |
+          # Strip leading 'v' from tag if present
+          CLEAN_TAG="${TAG#v}"
+          if [[ "$CLEAN_TAG" != "$VERSION" ]]; then
+            echo "::error::Release tag '$TAG' (→ $CLEAN_TAG) does not match pyproject.toml version '$VERSION'"
+            exit 1
+          fi
+          echo "✅ Tag '$TAG' matches version '$VERSION'"
+
+  # ── 2. Build sdist + wheel ────────────────────────────────────────────────
   build:
     name: Build distribution
+    needs: verify-version
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -41,19 +78,33 @@ jobs:
       - name: List distribution files
         run: ls -lh dist/
 
+      - name: Generate SHA256 checksums
+        run: |
+          cd dist
+          sha256sum * > SHA256SUMS.txt
+          cat SHA256SUMS.txt
+
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
         with:
           name: dist
           path: dist/
 
+  # ── 3. Verify the built wheel installs cleanly on multiple Pythons ────────
   test-install:
-    name: Test installation
+    name: Test installation (Python ${{ matrix.python-version }}, ${{ matrix.os }})
     needs: build
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.os }}
     strategy:
+      fail-fast: false
       matrix:
-        python-version: ["3.10", "3.12"]
+        python-version: ["3.10", "3.11", "3.12", "3.13"]
+        os: [ubuntu-latest]
+        include:
+          - python-version: "3.12"
+            os: macos-latest
+          - python-version: "3.12"
+            os: windows-latest
     steps:
       - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v5
@@ -67,14 +118,99 @@ jobs:
           path: dist/
 
       - name: Install from wheel
-        run: pip install dist/*.whl
+        run: pip install dist/quantsdk-*.whl
+        shell: bash
 
-      - name: Verify import and version
+      - name: Smoke test — import & version
         run: |
-          python -c "import quantsdk as qs; print(f'quantsdk {qs.__version__}')"
-          python -c "from quantsdk import Circuit; c = Circuit(2); c.h(0); c.cx(0, 1); print(c.draw())"
-          python -c "from quantsdk.gates import GATE_MAP; print(f'{len(GATE_MAP)} gates available')"
+          python -c "
+          import quantsdk as qs
+          print(f'quantsdk {qs.__version__}')
+          assert qs.__version__, 'Version must not be empty'
+          "
 
+      - name: Smoke test — circuit builder
+        run: |
+          python -c "
+          from quantsdk import Circuit
+          c = Circuit(2)
+          c.h(0)
+          c.cx(0, 1)
+          assert len(c.gates) == 2, 'Expected 2 gates'
+          print(c.draw())
+          print('✅ Circuit builder works')
+          "
+
+      - name: Smoke test — gate library
+        run: |
+          python -c "
+          from quantsdk.gates import GATE_MAP
+          n = len(GATE_MAP)
+          assert n >= 40, f'Expected 40+ gates, got {n}'
+          print(f'✅ {n} gates available')
+          "
+
+      - name: Smoke test — local simulator
+        run: |
+          python -c "
+          from quantsdk import Circuit
+          from quantsdk.simulators.local import LocalSimulator
+          c = Circuit(2)
+          c.h(0)
+          c.cx(0, 1)
+          c.measure_all()
+          sim = LocalSimulator()
+          result = sim.run(c, shots=100)
+          assert result.counts, 'Result should have counts'
+          print(f'✅ Simulator returned {len(result.counts)} bitstrings')
+          "
+
+  # ── 4. Build provenance attestation (supply chain security) ───────────────
+  provenance:
+    name: Generate SLSA provenance
+    needs: [build, test-install]
+    if: github.event_name == 'release'
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      contents: read
+      attestations: write
+    steps:
+      - name: Download artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: dist
+          path: dist/
+
+      - name: Generate attestations
+        uses: actions/attest-build-provenance@v2
+        with:
+          subject-path: "dist/*"
+
+  # ── 5. Upload checksums to release assets ─────────────────────────────────
+  release-assets:
+    name: Attach checksums to release
+    needs: build
+    if: github.event_name == 'release'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Download artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: dist
+          path: dist/
+
+      - name: Upload checksums to release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          RELEASE_TAG: ${{ github.event.release.tag_name }}
+        run: |
+          gh release upload "$RELEASE_TAG" dist/SHA256SUMS.txt --clobber
+        shell: bash
+
+  # ── 6. Publish to TestPyPI (workflow_dispatch only) ───────────────────────
   publish-testpypi:
     name: Publish to TestPyPI
     needs: [build, test-install]
@@ -94,17 +230,23 @@ jobs:
           name: dist
           path: dist/
 
+      - name: Remove checksum file (not a package)
+        run: rm -f dist/SHA256SUMS.txt
+
       - name: Publish to TestPyPI
         uses: pypa/gh-action-pypi-publish@release/v1
         with:
           repository-url: https://test.pypi.org/legacy/
 
+  # ── 7. Publish to PyPI (release or workflow_dispatch) ─────────────────────
   publish-pypi:
     name: Publish to PyPI
     needs: [build, test-install]
     if: >-
-      (github.event_name == 'release' && github.event.action == 'published') ||
-      (github.event_name == 'workflow_dispatch' && github.event.inputs.target == 'pypi')
+      !failure() && !cancelled() && (
+        (github.event_name == 'release' && github.event.action == 'published') ||
+        (github.event_name == 'workflow_dispatch' && github.event.inputs.target == 'pypi')
+      )
     runs-on: ubuntu-latest
     environment:
       name: pypi
@@ -117,6 +259,9 @@ jobs:
         with:
           name: dist
           path: dist/
+
+      - name: Remove checksum file (not a package)
+        run: rm -f dist/SHA256SUMS.txt
 
       - name: Publish to PyPI
         uses: pypa/gh-action-pypi-publish@release/v1

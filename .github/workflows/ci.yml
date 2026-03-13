@@ -10,6 +10,34 @@ permissions:
   contents: read
 
 jobs:
+  version-check:
+    name: Version consistency
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Check pyproject.toml ↔ __init__.py version match
+        run: |
+          TOML_VER=$(python -c "
+          import re, pathlib
+          text = pathlib.Path('pyproject.toml').read_text()
+          m = re.search(r'^version\s*=\s*\"([^\"]+)\"', text, re.MULTILINE)
+          print(m.group(1))
+          ")
+          INIT_VER=$(python -c "
+          import re, pathlib
+          text = pathlib.Path('src/quantsdk/__init__.py').read_text()
+          m = re.search(r'__version__\s*=\s*\"([^\"]+)\"', text)
+          print(m.group(1) if m else 'NOT_FOUND')
+          ")
+          echo "pyproject.toml: $TOML_VER"
+          echo "__init__.py:    $INIT_VER"
+          if [[ "$INIT_VER" != "NOT_FOUND" && "$TOML_VER" != "$INIT_VER" ]]; then
+            echo "::error::Version mismatch: pyproject.toml=$TOML_VER vs __init__.py=$INIT_VER"
+            exit 1
+          fi
+          echo "✅ Versions consistent"
+
   lint:
     name: Lint
     runs-on: ubuntu-latest

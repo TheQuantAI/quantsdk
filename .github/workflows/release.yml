@@ -1,0 +1,171 @@
+name: Prepare Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Release version (e.g., 0.2.0)"
+        required: true
+        type: string
+      prerelease:
+        description: "Mark as pre-release?"
+        required: false
+        default: false
+        type: boolean
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  prepare:
+    name: Prepare release v${{ inputs.version }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Validate version format
+        run: |
+          VERSION="${{ inputs.version }}"
+          if [[ ! "$VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+(-[a-zA-Z0-9.]+)?$ ]]; then
+            echo "::error::Invalid version format: '$VERSION'. Expected: MAJOR.MINOR.PATCH[-pre]"
+            exit 1
+          fi
+          echo "✅ Version format valid: $VERSION"
+
+      - name: Check version is not already tagged
+        run: |
+          if git tag -l | grep -qx "v${{ inputs.version }}"; then
+            echo "::error::Tag v${{ inputs.version }} already exists"
+            exit 1
+          fi
+          echo "✅ Tag v${{ inputs.version }} is available"
+
+      - name: Update version in pyproject.toml
+        run: |
+          python -c "
+          import re, pathlib
+          p = pathlib.Path('pyproject.toml')
+          text = p.read_text()
+          new_text = re.sub(
+              r'^(version\s*=\s*)\"[^\"]+\"',
+              r'\g<1>\"${{ inputs.version }}\"',
+              text,
+              count=1,
+              flags=re.MULTILINE,
+          )
+          if text == new_text:
+              raise RuntimeError('Version replacement failed — pattern not found')
+          p.write_text(new_text)
+          print(f'Updated pyproject.toml → ${{ inputs.version }}')
+          "
+
+      - name: Update __init__.py version
+        run: |
+          INIT_FILE="src/quantsdk/__init__.py"
+          if grep -q '__version__' "$INIT_FILE"; then
+            python -c "
+          import re, pathlib
+          p = pathlib.Path('$INIT_FILE')
+          text = p.read_text()
+          new_text = re.sub(
+              r'(__version__\s*=\s*)\"[^\"]+\"',
+              r'\g<1>\"${{ inputs.version }}\"',
+              text,
+              count=1,
+          )
+          p.write_text(new_text)
+          print(f'Updated __init__.py → ${{ inputs.version }}')
+          "
+          else
+            echo "No __version__ in $INIT_FILE, skipping"
+          fi
+
+      - name: Add CHANGELOG entry placeholder
+        run: |
+          VERSION="${{ inputs.version }}"
+          DATE=$(date +%Y-%m-%d)
+          ENTRY="## [$VERSION] — $DATE"
+
+          if grep -q "\[$VERSION\]" CHANGELOG.md 2>/dev/null; then
+            echo "CHANGELOG.md already has entry for $VERSION, skipping"
+          elif [[ -f CHANGELOG.md ]]; then
+            # Insert after the first heading line
+            python -c "
+          import pathlib
+          p = pathlib.Path('CHANGELOG.md')
+          lines = p.read_text().splitlines(keepends=True)
+          insert_idx = None
+          for i, line in enumerate(lines):
+              if line.startswith('## ') and i > 0:
+                  insert_idx = i
+                  break
+          if insert_idx is None:
+              insert_idx = len(lines)
+          entry = [
+              '\n',
+              '$ENTRY\n',
+              '\n',
+              '### Added\n',
+              '- \n',
+              '\n',
+              '### Changed\n',
+              '- \n',
+              '\n',
+              '### Fixed\n',
+              '- \n',
+              '\n',
+          ]
+          lines[insert_idx:insert_idx] = entry
+          p.write_text(''.join(lines))
+          print(f'Added CHANGELOG placeholder for $VERSION')
+          "
+          else
+            echo "No CHANGELOG.md found, skipping"
+          fi
+
+      - name: Create release branch and PR
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          BRANCH="release/v${{ inputs.version }}"
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git checkout -b "$BRANCH"
+          git add -A
+          git commit -m "chore: prepare release v${{ inputs.version }}"
+          git push origin "$BRANCH"
+
+          PRERELEASE_FLAG=""
+          if [[ "${{ inputs.prerelease }}" == "true" ]]; then
+            PRERELEASE_FLAG="(pre-release)"
+          fi
+
+          gh pr create \
+            --title "Release v${{ inputs.version }} $PRERELEASE_FLAG" \
+            --body "## Release v${{ inputs.version }}
+
+          This PR was automatically created by the **Prepare Release** workflow.
+
+          ### Checklist
+          - [ ] Version bumped in \`pyproject.toml\` → \`${{ inputs.version }}\`
+          - [ ] Version bumped in \`__init__.py\` → \`${{ inputs.version }}\`
+          - [ ] CHANGELOG.md updated with release notes
+          - [ ] All CI checks pass
+          - [ ] Reviewed by maintainer
+
+          ### After merging
+          1. Create a GitHub Release with tag \`v${{ inputs.version }}\`
+          2. The **Publish to PyPI** workflow will automatically trigger
+          3. Verify the package on [PyPI](https://pypi.org/project/quantsdk/${{ inputs.version }}/)
+          " \
+            --base main \
+            --head "$BRANCH" \
+            --label "release"
