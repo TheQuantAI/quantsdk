@@ -39,18 +39,22 @@ logger = logging.getLogger(__name__)
 
 # ─── GPU detection ───
 
-_GPU_METHODS = frozenset({
-    "statevector_gpu",
-    "density_matrix_gpu",
-    "unitary_gpu",
-})
+_GPU_METHODS = frozenset(
+    {
+        "statevector_gpu",
+        "density_matrix_gpu",
+        "unitary_gpu",
+    }
+)
 
-_CPU_SV_METHODS = frozenset({
-    "statevector",
-    "density_matrix",
-    "matrix_product_state",
-    "automatic",
-})
+_CPU_SV_METHODS = frozenset(
+    {
+        "statevector",
+        "density_matrix",
+        "matrix_product_state",
+        "automatic",
+    }
+)
 
 
 def _check_aer() -> None:
@@ -270,11 +274,28 @@ class GPUSimulator(Backend):
             num_qubits=self._max_qubits,
             status=BackendStatus.ONLINE,
             is_simulator=True,
-            native_gates=frozenset({
-                "h", "x", "y", "z", "s", "sdg", "t", "tdg",
-                "rx", "ry", "rz", "u3", "cx", "cz", "swap",
-                "ccx", "measure", "reset",
-            }),
+            native_gates=frozenset(
+                {
+                    "h",
+                    "x",
+                    "y",
+                    "z",
+                    "s",
+                    "sdg",
+                    "t",
+                    "tdg",
+                    "rx",
+                    "ry",
+                    "rz",
+                    "u3",
+                    "cx",
+                    "cz",
+                    "swap",
+                    "ccx",
+                    "measure",
+                    "reset",
+                }
+            ),
             max_shots=1_000_000,
             queue_depth=0,
             metadata={

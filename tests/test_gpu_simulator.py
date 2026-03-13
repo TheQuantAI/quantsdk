@@ -112,16 +112,7 @@ class TestGPUSimulatorCPU:
         assert result.counts.get("1", 0) == 100
 
     def test_run_multi_gate(self) -> None:
-        circuit = (
-            Circuit(3)
-            .h(0)
-            .cx(0, 1)
-            .s(1)
-            .t(2)
-            .rx(2, math.pi / 2)
-            .cz(0, 2)
-            .measure_all()
-        )
+        circuit = Circuit(3).h(0).cx(0, 1).s(1).t(2).rx(2, math.pi / 2).cz(0, 2).measure_all()
         sim = GPUSimulator(method="cpu")
         result = sim.run(circuit, shots=1000, seed=42)
         assert sum(result.counts.values()) == 1000
@@ -319,8 +310,9 @@ class TestImportGuard:
         _check_aer()
 
     def test_check_aer_fails(self) -> None:
-        with patch.dict("sys.modules", {"qiskit_aer": None}), pytest.raises(
-            ImportError, match="Qiskit Aer"
+        with (
+            patch.dict("sys.modules", {"qiskit_aer": None}),
+            pytest.raises(ImportError, match="Qiskit Aer"),
         ):
             _check_aer()
 
