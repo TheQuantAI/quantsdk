@@ -4,7 +4,7 @@
 """
 Qiskit interop — convert between QuantSDK circuits and Qiskit QuantumCircuits.
 
-Requires: pip install quantsdk[ibm]  (or pip install qiskit)
+Requires: pip install thequantsdk[ibm]  (or pip install qiskit)
 """
 
 from __future__ import annotations
@@ -71,7 +71,7 @@ def _check_qiskit() -> None:
         import qiskit  # noqa: F401
     except ImportError as e:
         raise ImportError(
-            "Qiskit is required for Qiskit interop. Install it with: pip install quantsdk[ibm]"
+            "Qiskit is required for Qiskit interop. Install it with: pip install thequantsdk[ibm]"
         ) from e
 
 

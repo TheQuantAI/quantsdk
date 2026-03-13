@@ -3,7 +3,7 @@
 ## Quick Install
 
 ```bash
-pip install quantsdk
+pip install thequantsdk
 ```
 
 This installs the core SDK with the local simulator. No external dependencies
@@ -15,31 +15,31 @@ QuantSDK uses optional dependency groups so you only install what you need:
 
 === "IBM Quantum"
     ```bash
-    pip install quantsdk[ibm]
+    pip install thequantsdk[ibm]
     ```
     Includes `qiskit`, `qiskit-ibm-runtime`, and `qiskit-aer` for IBM backends.
 
 === "Qiskit Interop"
     ```bash
-    pip install quantsdk[interop]
+    pip install thequantsdk[interop]
     ```
     Includes `qiskit` for circuit conversion and OpenQASM export.
 
 === "Visualization"
     ```bash
-    pip install quantsdk[viz]
+    pip install thequantsdk[viz]
     ```
     Includes `matplotlib` and `pandas` for histograms and DataFrames.
 
 === "GPU Simulator"
     ```bash
-    pip install quantsdk[gpu]
+    pip install thequantsdk[gpu]
     ```
     Includes `cuquantum` for GPU-accelerated simulation (requires NVIDIA GPU).
 
 === "Everything"
     ```bash
-    pip install quantsdk[all]
+    pip install thequantsdk[all]
     ```
     Installs all optional dependencies.
 
@@ -93,7 +93,7 @@ pip list | grep quantsdk
 If you see errors about Qiskit, install the interop extras:
 
 ```bash
-pip install quantsdk[interop]
+pip install thequantsdk[interop]
 ```
 
 ### IBM Backend authentication

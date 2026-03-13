@@ -188,7 +188,7 @@ class Result:
         except ImportError as e:
             raise ImportError(
                 "matplotlib is required for plot_histogram(). "
-                "Install it with: pip install quantsdk[viz]"
+                "Install it with: pip install thequantsdk[viz]"
             ) from e
 
         # Sort by count descending

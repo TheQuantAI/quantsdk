@@ -3,7 +3,7 @@ requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [project]
-name = "quantsdk"
+name = "thequantsdk"
 version = "0.1.0"
 description = "Write quantum code once, run anywhere. A framework-agnostic quantum computing SDK."
 readme = "README.md"
@@ -67,7 +67,7 @@ docs = [
 ]
 
 # All optional deps
-all = ["quantsdk[ibm,ionq,gpu,interop,viz,dev,docs]"]
+all = ["thequantsdk[ibm,ionq,gpu,interop,viz,dev,docs]"]
 
 [project.urls]
 Homepage = "https://thequantcloud.com"

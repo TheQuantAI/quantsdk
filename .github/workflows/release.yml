@@ -164,7 +164,7 @@ jobs:
           ### After merging
           1. Create a GitHub Release with tag \`v${{ inputs.version }}\`
           2. The **Publish to PyPI** workflow will automatically trigger
-          3. Verify the package on [PyPI](https://pypi.org/project/quantsdk/${{ inputs.version }}/)
+          3. Verify the package on [PyPI](https://pypi.org/project/thequantsdk/${{ inputs.version }}/)
           " \
             --base main \
             --head "$BRANCH" \

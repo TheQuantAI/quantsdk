@@ -4,7 +4,7 @@
 """
 Cirq interop — convert between QuantSDK circuits and Google Cirq circuits.
 
-Requires: pip install quantsdk[interop]  (or pip install cirq-core)
+Requires: pip install thequantsdk[interop]  (or pip install cirq-core)
 """
 
 from __future__ import annotations
@@ -73,7 +73,7 @@ def _check_cirq() -> None:
         import cirq as _cirq  # noqa: F401
     except ImportError as e:
         raise ImportError(
-            "Cirq is required for Cirq interop. Install it with: pip install quantsdk[interop]"
+            "Cirq is required for Cirq interop. Install it with: pip install thequantsdk[interop]"
         ) from e
 
 

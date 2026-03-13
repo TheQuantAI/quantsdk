@@ -4,7 +4,7 @@
 """
 IonQ backend adapter -- run QuantSDK circuits on IonQ trapped-ion hardware.
 
-Access IonQ via Amazon Braket SDK.  Requires: pip install quantsdk[ionq]
+Access IonQ via Amazon Braket SDK.  Requires: pip install thequantsdk[ionq]
 
 Usage::
 
@@ -77,7 +77,7 @@ def _check_braket() -> None:
     except ImportError as e:
         raise ImportError(
             "Amazon Braket SDK is required for IonQ backends. "
-            "Install it with: pip install quantsdk[ionq]"
+            "Install it with: pip install thequantsdk[ionq]"
         ) from e
 
 

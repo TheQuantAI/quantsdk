@@ -97,24 +97,24 @@ qasm = circuit.to_openqasm()
 ## Installation
 
 ```bash
-pip install quantsdk
+pip install thequantsdk
 ```
 
 With optional backends:
 
 === "IBM Quantum"
     ```bash
-    pip install quantsdk[ibm]
+    pip install thequantsdk[ibm]
     ```
 
 === "GPU Simulator"
     ```bash
-    pip install quantsdk[gpu]
+    pip install thequantsdk[gpu]
     ```
 
 === "Everything"
     ```bash
-    pip install quantsdk[all]
+    pip install thequantsdk[all]
     ```
 
 ---

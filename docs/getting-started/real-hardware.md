@@ -22,7 +22,7 @@ QuantSDK makes it easy to go from simulation to real quantum processors.
 ### 2. Install IBM Dependencies
 
 ```bash
-pip install quantsdk[ibm]
+pip install thequantsdk[ibm]
 ```
 
 ### 3. Run on IBM Quantum

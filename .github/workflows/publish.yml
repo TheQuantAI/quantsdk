@@ -118,7 +118,7 @@ jobs:
           path: dist/
 
       - name: Install from wheel
-        run: pip install dist/quantsdk-*.whl
+        run: pip install dist/thequantsdk-*.whl
         shell: bash
 
       - name: Smoke test — import & version
@@ -220,7 +220,7 @@ jobs:
     runs-on: ubuntu-latest
     environment:
       name: testpypi
-      url: https://test.pypi.org/p/quantsdk
+      url: https://test.pypi.org/p/thequantsdk
     permissions:
       id-token: write
     steps:
@@ -250,7 +250,7 @@ jobs:
     runs-on: ubuntu-latest
     environment:
       name: pypi
-      url: https://pypi.org/p/quantsdk
+      url: https://pypi.org/p/thequantsdk
     permissions:
       id-token: write
     steps:

@@ -490,7 +490,7 @@ class Circuit:
     def to_qiskit(self) -> Any:
         """Convert this circuit to a Qiskit QuantumCircuit.
 
-        Requires: ``pip install quantsdk[ibm]``
+        Requires: ``pip install thequantsdk[ibm]``
 
         Returns:
             A ``qiskit.circuit.QuantumCircuit`` equivalent.
@@ -523,7 +523,7 @@ class Circuit:
     def from_qiskit(cls, qiskit_circuit: Any) -> Circuit:
         """Create a QuantSDK Circuit from a Qiskit QuantumCircuit.
 
-        Requires: ``pip install quantsdk[ibm]``
+        Requires: ``pip install thequantsdk[ibm]``
 
         Args:
             qiskit_circuit: A ``qiskit.circuit.QuantumCircuit``.
@@ -552,7 +552,7 @@ class Circuit:
     def to_cirq(self) -> Any:
         """Convert this circuit to a Google Cirq Circuit.
 
-        Requires: ``pip install quantsdk[interop]``
+        Requires: ``pip install thequantsdk[interop]``
 
         Returns:
             A ``cirq.Circuit`` equivalent.
@@ -570,7 +570,7 @@ class Circuit:
     def from_cirq(cls, cirq_circuit: Any) -> Circuit:
         """Create a QuantSDK Circuit from a Google Cirq Circuit.
 
-        Requires: ``pip install quantsdk[interop]``
+        Requires: ``pip install thequantsdk[interop]``
 
         Args:
             cirq_circuit: A ``cirq.Circuit``.
@@ -585,7 +585,7 @@ class Circuit:
     def to_pennylane(self) -> Any:
         """Convert this circuit to a PennyLane QuantumScript (tape).
 
-        Requires: ``pip install quantsdk[interop]``
+        Requires: ``pip install thequantsdk[interop]``
 
         Returns:
             A ``pennylane.tape.QuantumScript`` containing the operations.
@@ -603,7 +603,7 @@ class Circuit:
     def from_pennylane(cls, tape: Any) -> Circuit:
         """Create a QuantSDK Circuit from a PennyLane QuantumScript.
 
-        Requires: ``pip install quantsdk[interop]``
+        Requires: ``pip install thequantsdk[interop]``
 
         Args:
             tape: A ``pennylane.tape.QuantumScript``.

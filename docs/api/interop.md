@@ -111,8 +111,8 @@ measure q[1] -> c[1];
 
 ## Notes
 
-- **Qiskit interop** requires `pip install quantsdk[interop]` (or `quantsdk[ibm]`)
-- **OpenQASM interop** requires `pip install quantsdk[interop]` (uses Qiskit's QASM parser for import)
+- **Qiskit interop** requires `pip install thequantsdk[interop]` (or `quantsdk[ibm]`)
+- **OpenQASM interop** requires `pip install thequantsdk[interop]` (uses Qiskit's QASM parser for import)
 - Gate parameters (rotation angles) are preserved exactly during round-trips
 - Measurement mappings are preserved during conversion
 - Circuit names are carried over when available

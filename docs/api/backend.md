@@ -88,7 +88,7 @@ result = sim.run(circuit, shots=1000, seed=42)
 
 ## IBM Backends
 
-Requires `pip install quantsdk[ibm]`.
+Requires `pip install thequantsdk[ibm]`.
 
 ::: quantsdk.backends.ibm.IBMBackend
     options:

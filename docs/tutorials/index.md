@@ -38,7 +38,7 @@ Explore cutting-edge quantum applications.
 All tutorials assume you have QuantSDK installed:
 
 ```bash
-pip install quantsdk[viz]  # includes matplotlib for visualization
+pip install thequantsdk[viz]  # includes matplotlib for visualization
 ```
 
 And have completed the [Getting Started](../getting-started/index.md) guide.
