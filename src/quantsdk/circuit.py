@@ -549,6 +549,39 @@ class Circuit:
 
         return from_openqasm(qasm_str)
 
+    def to_cirq(self) -> Any:
+        """Convert this circuit to a Google Cirq Circuit.
+
+        Requires: ``pip install quantsdk[interop]``
+
+        Returns:
+            A ``cirq.Circuit`` equivalent.
+
+        Example::
+
+            circuit = qs.Circuit(2).h(0).cx(0, 1).measure_all()
+            cirq_circuit = circuit.to_cirq()
+        """
+        from quantsdk.interop.cirq_interop import to_cirq
+
+        return to_cirq(self)
+
+    @classmethod
+    def from_cirq(cls, cirq_circuit: Any) -> Circuit:
+        """Create a QuantSDK Circuit from a Google Cirq Circuit.
+
+        Requires: ``pip install quantsdk[interop]``
+
+        Args:
+            cirq_circuit: A ``cirq.Circuit``.
+
+        Returns:
+            A QuantSDK Circuit equivalent.
+        """
+        from quantsdk.interop.cirq_interop import from_cirq
+
+        return from_cirq(cirq_circuit)
+
     # ─── Circuit Analysis ───
 
     def count_ops(self) -> dict[str, int]:
