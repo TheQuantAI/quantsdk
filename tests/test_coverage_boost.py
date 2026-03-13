@@ -887,6 +887,7 @@ class TestIBMBackendMocked:
 
     def test_check_ibm_deps_passes(self) -> None:
         pytest.importorskip("qiskit")
+        pytest.importorskip("qiskit_ibm_runtime")
         from quantsdk.backends.ibm import _check_ibm_deps
 
         _check_ibm_deps()
