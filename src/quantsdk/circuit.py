@@ -582,6 +582,39 @@ class Circuit:
 
         return from_cirq(cirq_circuit)
 
+    def to_pennylane(self) -> Any:
+        """Convert this circuit to a PennyLane QuantumScript (tape).
+
+        Requires: ``pip install quantsdk[interop]``
+
+        Returns:
+            A ``pennylane.tape.QuantumScript`` containing the operations.
+
+        Example::
+
+            circuit = qs.Circuit(2).h(0).cx(0, 1).measure_all()
+            tape = circuit.to_pennylane()
+        """
+        from quantsdk.interop.pennylane_interop import to_pennylane
+
+        return to_pennylane(self)
+
+    @classmethod
+    def from_pennylane(cls, tape: Any) -> Circuit:
+        """Create a QuantSDK Circuit from a PennyLane QuantumScript.
+
+        Requires: ``pip install quantsdk[interop]``
+
+        Args:
+            tape: A ``pennylane.tape.QuantumScript``.
+
+        Returns:
+            A QuantSDK Circuit equivalent.
+        """
+        from quantsdk.interop.pennylane_interop import from_pennylane
+
+        return from_pennylane(tape)
+
     # ─── Circuit Analysis ───
 
     def count_ops(self) -> dict[str, int]:
