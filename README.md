@@ -30,13 +30,14 @@ No more vendor lock-in. No more rewriting circuits for each framework. **One API
 ## Features
 
 - **Framework-Agnostic** — Write once, export to Qiskit or OpenQASM 2.0
-- **Smart Routing** — `qs.run()` automatically routes to the best available backend
+- **QuantRouter** — Rule-based smart routing picks the best backend for your circuit
+- **Cloud Client** — Connect to TheQuantCloud for remote execution and job management
 - **Pythonic API** — Clean fluent interface, minimal boilerplate
 - **50+ Gates** — 44 gate classes, 54 named entries including all standard, parametric, and multi-qubit gates
 - **Rich Results** — Histograms, probabilities, DataFrames, expectation values
 - **Interop** — Seamless import/export with Qiskit circuits and OpenQASM 2.0
 - **Fast Simulator** — Pure NumPy statevector simulator, up to 24 qubits
-- **Well Tested** — 262+ tests across 7 test modules
+- **Well Tested** — 330+ tests across 10 test modules
 - **Open Source** — Apache 2.0 license
 
 ## Installation
@@ -204,6 +205,10 @@ src/quantsdk/
   result.py                # Result with counts, probabilities, viz
   runner.py                # qs.run() multi-backend routing
   backend.py               # Abstract Backend interface
+  router.py                # QuantRouter — rule-based smart backend routing
+  cloud/
+    __init__.py            # CloudClient — TheQuantCloud API client
+    config.py              # Cloud configuration and endpoint management
   simulators/
     local.py               # Pure NumPy statevector simulator
   interop/
