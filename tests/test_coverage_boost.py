@@ -9,6 +9,7 @@ gates.py, cloud/*, and interop/qiskit_interop.py that were < 90% covered.
 
 from __future__ import annotations
 
+import importlib
 import json
 import os
 import tempfile
@@ -18,6 +19,8 @@ import pytest
 
 from quantsdk.circuit import Circuit
 from quantsdk.result import Result
+
+_has_httpx = importlib.util.find_spec("httpx") is not None
 
 # ═══════════════════════════════════════════════════════════════════
 # quantsdk.__init__ lazy import tests
@@ -112,8 +115,9 @@ class TestResultEdgeCases:
         assert "probability" in df.columns
 
     def test_to_pandas_missing(self) -> None:
-        with patch.dict("sys.modules", {"pandas": None}), pytest.raises(
-            ImportError, match="pandas"
+        with (
+            patch.dict("sys.modules", {"pandas": None}),
+            pytest.raises(ImportError, match="pandas"),
         ):
             r = Result(counts={"00": 50}, shots=50)
             r.to_pandas()
@@ -125,8 +129,9 @@ class TestResultEdgeCases:
         assert fig is not None
 
     def test_plot_histogram_missing(self) -> None:
-        with patch.dict("sys.modules", {"matplotlib": None, "matplotlib.pyplot": None}), pytest.raises(
-            ImportError, match="matplotlib"
+        with (
+            patch.dict("sys.modules", {"matplotlib": None, "matplotlib.pyplot": None}),
+            pytest.raises(ImportError, match="matplotlib"),
         ):
             r = Result(counts={"00": 50}, shots=50)
             r.plot_histogram()
@@ -172,8 +177,9 @@ class TestRunnerPaths:
         """IBM backend shows helpful error when deps missing."""
         from quantsdk.runner import run
 
-        with patch.dict("sys.modules", {"quantsdk.backends.ibm": None}), pytest.raises(
-            ImportError, match="qiskit"
+        with (
+            patch.dict("sys.modules", {"quantsdk.backends.ibm": None}),
+            pytest.raises(ImportError, match="qiskit"),
         ):
             run(Circuit(1).x(0).measure_all(), backend="ibm_brisbane", shots=100)
 
@@ -516,9 +522,7 @@ class TestCloudClient:
         client._timeout = 30
         client._session = None
 
-        with patch.dict("sys.modules", {"httpx": None}), pytest.raises(
-            ImportError, match="httpx"
-        ):
+        with patch.dict("sys.modules", {"httpx": None}), pytest.raises(ImportError, match="httpx"):
             client._get_session()
 
     def test_context_manager(self) -> None:
@@ -535,6 +539,11 @@ class TestCloudClient:
         client = CloudClient.__new__(CloudClient)
         client._session = None
         client.close()  # Should not raise
+
+
+@pytest.mark.skipif(not _has_httpx, reason="httpx not installed")
+class TestCloudClientHTTP:
+    """Test CloudClient HTTP methods (requires httpx for @patch)."""
 
     @patch("httpx.Client")
     def test_request_success(self, mock_client_cls: MagicMock) -> None:
@@ -729,7 +738,12 @@ class TestCloudClient:
         mock_response.json.return_value = {
             "backends": [
                 {"name": "ibm_brisbane", "provider": "ibm", "num_qubits": 127},
-                {"name": "ionq_harmony", "provider": "ionq", "num_qubits": 11, "is_simulator": False},
+                {
+                    "name": "ionq_harmony",
+                    "provider": "ionq",
+                    "num_qubits": 11,
+                    "is_simulator": False,
+                },
             ]
         }
 
@@ -914,10 +928,10 @@ class TestFromQiskitExpanded:
         from quantsdk.interop.qiskit_interop import from_qiskit
 
         qc = QuantumCircuit(2)
-        qc.p(0.5, 0)       # PhaseGate
-        qc.rx(1.0, 0)      # RX
-        qc.ry(1.5, 1)      # RY
-        qc.rz(2.0, 0)      # RZ
+        qc.p(0.5, 0)  # PhaseGate
+        qc.rx(1.0, 0)  # RX
+        qc.ry(1.5, 1)  # RY
+        qc.rz(2.0, 0)  # RZ
         qc.u(1.0, 2.0, 3.0, 0)  # U3
 
         c = from_qiskit(qc)
@@ -1166,7 +1180,10 @@ class TestCloudConfigFile:
             with (
                 patch("quantsdk.cloud.config._CONFIG_FILE", config_file),
                 patch("quantsdk.cloud.config._CREDENTIALS_FILE", cred_file),
-                patch.dict(os.environ, {"QUANTCLOUD_API_KEY": "env-key", "QUANTCLOUD_API_BASE": "https://env.api.com"}),
+                patch.dict(
+                    os.environ,
+                    {"QUANTCLOUD_API_KEY": "env-key", "QUANTCLOUD_API_BASE": "https://env.api.com"},
+                ),
             ):
                 config = CloudConfig.load()
                 # Env should override
