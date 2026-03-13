@@ -4,7 +4,7 @@
 """
 IBM Quantum backend adapter — run QuantSDK circuits on IBM hardware.
 
-Requires: pip install quantsdk[ibm]  (qiskit + qiskit-ibm-runtime)
+Requires: pip install thequantsdk[ibm]  (qiskit + qiskit-ibm-runtime)
 
 Usage::
 
@@ -47,7 +47,7 @@ def _check_ibm_deps() -> None:
     except ImportError as e:
         raise ImportError(
             "qiskit and qiskit-ibm-runtime are required for IBM backends. "
-            "Install with: pip install quantsdk[ibm]"
+            "Install with: pip install thequantsdk[ibm]"
         ) from e
 
 
@@ -57,7 +57,7 @@ def _check_aer() -> None:
         import qiskit_aer  # noqa: F401
     except ImportError as e:
         raise ImportError(
-            "qiskit-aer is required for the AerBackend. Install with: pip install quantsdk[ibm]"
+            "qiskit-aer is required for the AerBackend. Install with: pip install thequantsdk[ibm]"
         ) from e
 
 

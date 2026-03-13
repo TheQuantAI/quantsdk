@@ -7,7 +7,7 @@ Run QuantSDK circuits on IBM Quantum processors and the Aer simulator.
 ### 1. Install Dependencies
 
 ```bash
-pip install quantsdk[ibm]
+pip install thequantsdk[ibm]
 ```
 
 This installs `qiskit`, `qiskit-ibm-runtime`, and `qiskit-aer`.
@@ -157,7 +157,7 @@ IBM Quantum has job queues. For time-sensitive work:
 ### "No module named 'qiskit'"
 
 ```bash
-pip install quantsdk[ibm]
+pip install thequantsdk[ibm]
 ```
 
 ### "Invalid API token"

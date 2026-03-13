@@ -4,7 +4,7 @@
 """
 PennyLane interop -- convert between QuantSDK circuits and PennyLane tapes.
 
-Requires: pip install quantsdk[interop]  (or pip install pennylane)
+Requires: pip install thequantsdk[interop]  (or pip install pennylane)
 """
 
 from __future__ import annotations
@@ -63,7 +63,7 @@ def _check_pennylane() -> None:
     except ImportError as e:
         raise ImportError(
             "PennyLane is required for PennyLane interop. "
-            "Install it with: pip install quantsdk[interop]"
+            "Install it with: pip install thequantsdk[interop]"
         ) from e
 
 

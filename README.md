@@ -43,17 +43,17 @@ No more vendor lock-in. No more rewriting circuits for each framework. **One API
 ## Installation
 
 ```bash
-pip install quantsdk
+pip install thequantsdk
 ```
 
 With optional backends:
 
 ```bash
-pip install quantsdk[ibm]     # IBM Quantum + Aer support
-pip install quantsdk[gpu]     # GPU simulator support
-pip install quantsdk[interop] # Qiskit interop
-pip install quantsdk[viz]     # Matplotlib visualization
-pip install quantsdk[all]     # Everything
+pip install thequantsdk[ibm]     # IBM Quantum + Aer support
+pip install thequantsdk[gpu]     # GPU simulator support
+pip install thequantsdk[interop] # Qiskit interop
+pip install thequantsdk[viz]     # Matplotlib visualization
+pip install thequantsdk[all]     # Everything
 ```
 
 ## Quick Start

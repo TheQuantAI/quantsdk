@@ -6,7 +6,7 @@
 
 ```bash
 # Install QuantSDK with visualization support
-pip install quantsdk[viz]
+pip install thequantsdk[viz]
 
 # Launch Jupyter
 pip install jupyterlab
