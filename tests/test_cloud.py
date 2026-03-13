@@ -187,10 +187,13 @@ class TestCloudConfig:
         assert config.optimize_for == "quality"
 
     def test_env_override(self) -> None:
-        with patch.dict(os.environ, {
-            "QUANTCLOUD_API_KEY": "env_key",
-            "QUANTCLOUD_API_BASE": "http://localhost:8000",
-        }):
+        with patch.dict(
+            os.environ,
+            {
+                "QUANTCLOUD_API_KEY": "env_key",
+                "QUANTCLOUD_API_BASE": "http://localhost:8000",
+            },
+        ):
             config = CloudConfig.load()
             assert config.api_key == "env_key"
             assert config.api_base == "http://localhost:8000"

@@ -201,52 +201,75 @@ class TestQuantRouter:
     def test_route_score_breakdown(self, router: QuantRouter, bell_circuit: Circuit) -> None:
         decision = router.route(bell_circuit)
         expected_factors = {
-            "qubit_compatibility", "connectivity_match", "gate_fidelity",
-            "queue_time", "cost", "historical_success"
+            "qubit_compatibility",
+            "connectivity_match",
+            "gate_fidelity",
+            "queue_time",
+            "cost",
+            "historical_success",
         }
         assert set(decision.score_breakdown.keys()) == expected_factors
 
-    def test_small_circuit_prefers_simulator(self, router: QuantRouter, bell_circuit: Circuit) -> None:
+    def test_small_circuit_prefers_simulator(
+        self, router: QuantRouter, bell_circuit: Circuit
+    ) -> None:
         """Small circuits should prefer simulators (free, fast, perfect fidelity)."""
         decision = router.route(bell_circuit)
         assert decision.backend == "sim_cpu"
 
     def test_optimize_for_quality(self, router: QuantRouter, bell_circuit: Circuit) -> None:
-        decision = router.route(bell_circuit, constraints=RoutingConstraints(
-            optimize_for="quality",
-        ))
+        decision = router.route(
+            bell_circuit,
+            constraints=RoutingConstraints(
+                optimize_for="quality",
+            ),
+        )
         assert decision.constraints.optimize_for == "quality"
 
     def test_optimize_for_speed(self, router: QuantRouter, bell_circuit: Circuit) -> None:
-        decision = router.route(bell_circuit, constraints=RoutingConstraints(
-            optimize_for="speed",
-        ))
+        decision = router.route(
+            bell_circuit,
+            constraints=RoutingConstraints(
+                optimize_for="speed",
+            ),
+        )
         # Simulator should win on speed (zero queue)
         assert decision.backend == "sim_cpu"
 
     def test_optimize_for_cost(self, router: QuantRouter, bell_circuit: Circuit) -> None:
-        decision = router.route(bell_circuit, constraints=RoutingConstraints(
-            optimize_for="cost",
-        ))
+        decision = router.route(
+            bell_circuit,
+            constraints=RoutingConstraints(
+                optimize_for="cost",
+            ),
+        )
         # Simulator is free
         assert decision.backend == "sim_cpu"
 
     def test_exclude_simulators(self, router: QuantRouter, bell_circuit: Circuit) -> None:
-        decision = router.route(bell_circuit, constraints=RoutingConstraints(
-            exclude_simulators=True,
-        ))
+        decision = router.route(
+            bell_circuit,
+            constraints=RoutingConstraints(
+                exclude_simulators=True,
+            ),
+        )
         assert decision.backend in ("ibm_test", "ionq_test")
 
     def test_preferred_providers(self, router: QuantRouter, bell_circuit: Circuit) -> None:
-        decision = router.route(bell_circuit, constraints=RoutingConstraints(
-            preferred_providers=frozenset(["ionq"]),
-        ))
+        decision = router.route(
+            bell_circuit,
+            constraints=RoutingConstraints(
+                preferred_providers=frozenset(["ionq"]),
+            ),
+        )
         assert decision.backend == "ionq_test"
 
     def test_no_suitable_backend(self) -> None:
-        router = QuantRouter(backends=[
-            BackendCapability(name="tiny", provider="test", num_qubits=1),
-        ])
+        router = QuantRouter(
+            backends=[
+                BackendCapability(name="tiny", provider="test", num_qubits=1),
+            ]
+        )
         c = Circuit(5)
         c.h(0)
         c.measure_all()
@@ -256,16 +279,22 @@ class TestQuantRouter:
     def test_max_cost_filter(self, router: QuantRouter, bell_circuit: Circuit) -> None:
         # Both QPU backends are too expensive: ibm=0.358, ionq=1.024 > 0.001
         with pytest.raises(ValueError, match="No suitable backend"):
-            router.route(bell_circuit, constraints=RoutingConstraints(
-                max_cost_usd=0.001,
-                exclude_simulators=True,
-            ))
+            router.route(
+                bell_circuit,
+                constraints=RoutingConstraints(
+                    max_cost_usd=0.001,
+                    exclude_simulators=True,
+                ),
+            )
 
     def test_max_queue_time_filter(self, router: QuantRouter, bell_circuit: Circuit) -> None:
-        decision = router.route(bell_circuit, constraints=RoutingConstraints(
-            max_queue_time_sec=90.0,
-            exclude_simulators=True,
-        ))
+        decision = router.route(
+            bell_circuit,
+            constraints=RoutingConstraints(
+                max_queue_time_sec=90.0,
+                exclude_simulators=True,
+            ),
+        )
         # ibm_test: 120s > 90s → filtered
         # ionq_test: 60s < 90s → passes
         assert decision.backend == "ionq_test"
@@ -333,7 +362,9 @@ class TestRoutingLog:
         router.route(bell_circuit)
         assert len(router.routing_log) == 1
 
-    def test_multiple_routes_accumulate(self, router: QuantRouter, bell_circuit: Circuit, ghz_circuit: Circuit) -> None:
+    def test_multiple_routes_accumulate(
+        self, router: QuantRouter, bell_circuit: Circuit, ghz_circuit: Circuit
+    ) -> None:
         router.route(bell_circuit)
         router.route(ghz_circuit)
         assert len(router.routing_log) == 2
@@ -349,7 +380,9 @@ class TestRoutingLog:
         assert "user_constraints" in entry
         assert "routing_decision" in entry
 
-    def test_training_data_circuit_features(self, router: QuantRouter, bell_circuit: Circuit) -> None:
+    def test_training_data_circuit_features(
+        self, router: QuantRouter, bell_circuit: Circuit
+    ) -> None:
         router.route(bell_circuit)
         data = router.export_training_data()
         features = data[0]["circuit_features"]
@@ -366,10 +399,16 @@ class TestCircuitFeatures:
 
     def test_frozen(self) -> None:
         features = CircuitFeatures(
-            qubit_count=2, gate_count=3, depth=2, cx_count=1,
+            qubit_count=2,
+            gate_count=3,
+            depth=2,
+            cx_count=1,
             gate_types=frozenset(["H", "CX"]),
-            single_qubit_gates=1, two_qubit_gates=1, three_qubit_gates=0,
-            measurement_count=2, has_parameterized_gates=False,
+            single_qubit_gates=1,
+            two_qubit_gates=1,
+            three_qubit_gates=0,
+            measurement_count=2,
+            has_parameterized_gates=False,
             algorithm_class=AlgorithmClass.BELL_STATE,
             connectivity=frozenset([(0, 1)]),
         )

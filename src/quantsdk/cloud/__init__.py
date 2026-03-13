@@ -56,8 +56,12 @@ class JobStatus(Enum):
     @property
     def is_terminal(self) -> bool:
         """Whether this status is a terminal state."""
-        return self in (JobStatus.COMPLETED, JobStatus.FAILED,
-                        JobStatus.TIMEOUT, JobStatus.CANCELLED)
+        return self in (
+            JobStatus.COMPLETED,
+            JobStatus.FAILED,
+            JobStatus.TIMEOUT,
+            JobStatus.CANCELLED,
+        )
 
 
 @dataclass
@@ -135,7 +139,9 @@ class UsageInfo:
 class CloudError(Exception):
     """Base exception for TheQuantCloud API errors."""
 
-    def __init__(self, message: str, status_code: int | None = None, response: dict[str, Any] | None = None):
+    def __init__(
+        self, message: str, status_code: int | None = None, response: dict[str, Any] | None = None
+    ):
         super().__init__(message)
         self.status_code = status_code
         self.response = response or {}
@@ -143,21 +149,25 @@ class CloudError(Exception):
 
 class AuthenticationError(CloudError):
     """Invalid or missing API key."""
+
     pass
 
 
 class QuotaExceededError(CloudError):
     """Usage quota exceeded for the current tier."""
+
     pass
 
 
 class JobNotFoundError(CloudError):
     """Job ID not found."""
+
     pass
 
 
 class BackendUnavailableError(CloudError):
     """Requested backend is not available."""
+
     pass
 
 
@@ -294,7 +304,11 @@ class CloudClient:
         if response.status_code == 404:
             raise JobNotFoundError(f"Resource not found: {path}", status_code=404)
         if response.status_code >= 400:
-            data = response.json() if response.headers.get("content-type", "").startswith("application/json") else {}
+            data = (
+                response.json()
+                if response.headers.get("content-type", "").startswith("application/json")
+                else {}
+            )
             raise CloudError(
                 data.get("error", f"HTTP {response.status_code}"),
                 status_code=response.status_code,

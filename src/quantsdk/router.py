@@ -258,9 +258,26 @@ def analyze_circuit(circuit: Any) -> CircuitFeatures:
     connectivity: set[tuple[int, int]] = set()
     cx_count = 0
 
-    param_gates = {"RX", "RY", "RZ", "U1", "U2", "U3", "P", "R",
-                   "CRX", "CRY", "CRZ", "CP", "CU1", "CU3",
-                   "RXX", "RYY", "RZZ", "RZX"}
+    param_gates = {
+        "RX",
+        "RY",
+        "RZ",
+        "U1",
+        "U2",
+        "U3",
+        "P",
+        "R",
+        "CRX",
+        "CRY",
+        "CRZ",
+        "CP",
+        "CU1",
+        "CU3",
+        "RXX",
+        "RYY",
+        "RZZ",
+        "RZX",
+    }
 
     for gate in gates:
         if gate.name == "MEASURE":
@@ -276,10 +293,29 @@ def analyze_circuit(circuit: Any) -> CircuitFeatures:
             two_q += 1
             q0, q1 = gate.qubits
             connectivity.add((min(q0, q1), max(q0, q1)))
-            if gate.name in ("CX", "CY", "CZ", "CH", "SWAP", "iSWAP",
-                             "DCX", "ECR", "CS", "CSdg", "CSX",
-                             "CRX", "CRY", "CRZ", "CP", "CU1", "CU3",
-                             "RXX", "RYY", "RZZ", "RZX"):
+            if gate.name in (
+                "CX",
+                "CY",
+                "CZ",
+                "CH",
+                "SWAP",
+                "iSWAP",
+                "DCX",
+                "ECR",
+                "CS",
+                "CSdg",
+                "CSX",
+                "CRX",
+                "CRY",
+                "CRZ",
+                "CP",
+                "CU1",
+                "CU3",
+                "RXX",
+                "RYY",
+                "RZZ",
+                "RZX",
+            ):
                 cx_count += 1
         elif nq == 3:
             three_q += 1
@@ -291,9 +327,7 @@ def analyze_circuit(circuit: Any) -> CircuitFeatures:
     total_gate_count = single_q + two_q + three_q
 
     # Detect algorithm class
-    algorithm_class = _detect_algorithm_class(
-        circuit, gate_types, single_q, two_q, parameterized
-    )
+    algorithm_class = _detect_algorithm_class(circuit, gate_types, single_q, two_q, parameterized)
 
     return CircuitFeatures(
         qubit_count=circuit.num_qubits,
@@ -334,9 +368,11 @@ def _detect_algorithm_class(
         return AlgorithmClass.GHZ
 
     # QFT: lots of H + controlled rotations
-    if ("H" in gate_types and
-            any(g in gate_types for g in ("CP", "CRZ", "CU1")) and
-            not parameterized):
+    if (
+        "H" in gate_types
+        and any(g in gate_types for g in ("CP", "CRZ", "CU1"))
+        and not parameterized
+    ):
         return AlgorithmClass.QFT
 
     # QAOA: parameterized with RZZ or ZZ-like + RX mixers
@@ -364,7 +400,9 @@ _DEFAULT_BACKENDS: list[BackendCapability] = [
         provider="quantsdk",
         num_qubits=24,
         is_simulator=True,
-        native_gates=frozenset(["H", "X", "Y", "Z", "CX", "CZ", "RX", "RY", "RZ", "U3", "SWAP", "CCX"]),
+        native_gates=frozenset(
+            ["H", "X", "Y", "Z", "CX", "CZ", "RX", "RY", "RZ", "U3", "SWAP", "CCX"]
+        ),
         avg_single_qubit_fidelity=1.0,
         avg_two_qubit_fidelity=1.0,
         queue_depth=0,
@@ -377,7 +415,9 @@ _DEFAULT_BACKENDS: list[BackendCapability] = [
         provider="qiskit",
         num_qubits=32,
         is_simulator=True,
-        native_gates=frozenset(["H", "X", "Y", "Z", "CX", "CZ", "RX", "RY", "RZ", "U3", "SWAP", "CCX"]),
+        native_gates=frozenset(
+            ["H", "X", "Y", "Z", "CX", "CZ", "RX", "RY", "RZ", "U3", "SWAP", "CCX"]
+        ),
         avg_single_qubit_fidelity=1.0,
         avg_two_qubit_fidelity=1.0,
         queue_depth=0,
@@ -507,8 +547,12 @@ class QuantRouter:
         # Replace existing backend with the same name
         self._backends = [b for b in self._backends if b.name != backend.name]
         self._backends.append(backend)
-        logger.info("Registered backend: %s (%s, %d qubits)",
-                     backend.name, backend.provider, backend.num_qubits)
+        logger.info(
+            "Registered backend: %s (%s, %d qubits)",
+            backend.name,
+            backend.provider,
+            backend.num_qubits,
+        )
 
     def update_backend(self, name: str, **updates: Any) -> None:
         """Update a backend's dynamic properties (queue depth, availability).
@@ -521,6 +565,7 @@ class QuantRouter:
             if b.name == name:
                 # Create a new BackendCapability with updated fields
                 from dataclasses import asdict
+
                 current = asdict(b)
                 current.update(updates)
                 self._backends[i] = BackendCapability(
@@ -609,8 +654,13 @@ class QuantRouter:
         # Step 7: Log for training data
         self._log_decision(decision)
 
-        logger.info("Routed %d-qubit circuit to '%s' (score=%.4f) in %.1fms",
-                     features.qubit_count, best_name, scores[best_name], elapsed_ms)
+        logger.info(
+            "Routed %d-qubit circuit to '%s' (score=%.4f) in %.1fms",
+            features.qubit_count,
+            best_name,
+            scores[best_name],
+            elapsed_ms,
+        )
 
         return decision
 
@@ -644,7 +694,10 @@ class QuantRouter:
                 continue
 
             # Provider filter
-            if constraints.preferred_providers and b.provider not in constraints.preferred_providers:
+            if (
+                constraints.preferred_providers
+                and b.provider not in constraints.preferred_providers
+            ):
                 continue
 
             # Cost filter
@@ -654,7 +707,10 @@ class QuantRouter:
                     continue
 
             # Queue time filter
-            if constraints.max_queue_time_sec is not None and b.avg_queue_time_sec > constraints.max_queue_time_sec:
+            if (
+                constraints.max_queue_time_sec is not None
+                and b.avg_queue_time_sec > constraints.max_queue_time_sec
+            ):
                 continue
 
             candidates.append(b)
@@ -697,7 +753,9 @@ class QuantRouter:
             # Real implementation would check actual topology graph embedding
             entangling_density = features.two_qubit_gates / max(features.gate_count, 1)
             # Higher fidelity backends handle dense entanglement better
-            conn_score = max(0.3, 1.0 - entangling_density * (1 - backend.avg_two_qubit_fidelity) * 10)
+            conn_score = max(
+                0.3, 1.0 - entangling_density * (1 - backend.avg_two_qubit_fidelity) * 10
+            )
         breakdown["connectivity_match"] = round(conn_score, 4)
 
         # 3. Gate fidelity (0-1)

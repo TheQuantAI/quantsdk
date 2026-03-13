@@ -611,15 +611,29 @@ class Circuit:
 
                 # Determine symbols for control and target qubit
                 controlled_gates = {
-                    "CX": ("●", "X"), "CY": ("●", "Y"), "CZ": ("●", "●"),
-                    "CH": ("●", "H"), "CS": ("●", "S"), "CSdg": ("●", "S†"),
-                    "CSX": ("●", "SX"), "CRX": ("●", "RX"), "CRY": ("●", "RY"),
-                    "CRZ": ("●", "RZ"), "CP": ("●", "P"), "CU1": ("●", "U1"),
+                    "CX": ("●", "X"),
+                    "CY": ("●", "Y"),
+                    "CZ": ("●", "●"),
+                    "CH": ("●", "H"),
+                    "CS": ("●", "S"),
+                    "CSdg": ("●", "S†"),
+                    "CSX": ("●", "SX"),
+                    "CRX": ("●", "RX"),
+                    "CRY": ("●", "RY"),
+                    "CRZ": ("●", "RZ"),
+                    "CP": ("●", "P"),
+                    "CU1": ("●", "U1"),
                     "CU3": ("●", "U3"),
                 }
                 symmetric_gates = {
-                    "SWAP": "x", "iSWAP": "iS", "RXX": "RXX", "RYY": "RYY",
-                    "RZZ": "RZZ", "RZX": "RZX", "DCX": "DCX", "ECR": "ECR",
+                    "SWAP": "x",
+                    "iSWAP": "iS",
+                    "RXX": "RXX",
+                    "RYY": "RYY",
+                    "RZZ": "RZZ",
+                    "RZX": "RZX",
+                    "DCX": "DCX",
+                    "ECR": "ECR",
                 }
 
                 if gate.name in controlled_gates:
