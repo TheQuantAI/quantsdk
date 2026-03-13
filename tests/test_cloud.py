@@ -6,7 +6,7 @@
 from __future__ import annotations
 
 import os
-from unittest.mock import MagicMock, patch
+from unittest.mock import patch
 
 import pytest
 
@@ -22,7 +22,6 @@ from quantsdk.cloud import (
     UsageInfo,
 )
 from quantsdk.cloud.config import CloudConfig
-
 
 # ─── JobStatus Tests ───
 
@@ -160,15 +159,15 @@ class TestCloudClientInit:
 
     def test_from_env_var(self) -> None:
         with patch.dict(os.environ, {"QUANTCLOUD_API_KEY": "env_key_456"}):
-            client = CloudClient()
-            # Should not raise AuthenticationError
+            CloudClient()  # Should not raise AuthenticationError
 
     def test_no_key_raises(self) -> None:
-        with patch.dict(os.environ, {}, clear=True):
-            # Ensure no config file exists
-            with patch("os.path.exists", return_value=False):
-                with pytest.raises(AuthenticationError, match="No API key"):
-                    CloudClient()
+        with (
+            patch.dict(os.environ, {}, clear=True),
+            patch("os.path.exists", return_value=False),
+            pytest.raises(AuthenticationError, match="No API key"),
+        ):
+            CloudClient()
 
     def test_context_manager(self) -> None:
         with CloudClient(api_key="test") as client:

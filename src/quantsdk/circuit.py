@@ -610,20 +610,20 @@ class Circuit:
                 min_q, max_q = min(q0, q1), max(q0, q1)
 
                 # Determine symbols for control and target qubit
-                _CONTROLLED_GATES = {
+                controlled_gates = {
                     "CX": ("●", "X"), "CY": ("●", "Y"), "CZ": ("●", "●"),
                     "CH": ("●", "H"), "CS": ("●", "S"), "CSdg": ("●", "S†"),
                     "CSX": ("●", "SX"), "CRX": ("●", "RX"), "CRY": ("●", "RY"),
                     "CRZ": ("●", "RZ"), "CP": ("●", "P"), "CU1": ("●", "U1"),
                     "CU3": ("●", "U3"),
                 }
-                _SYMMETRIC_GATES = {
+                symmetric_gates = {
                     "SWAP": "x", "iSWAP": "iS", "RXX": "RXX", "RYY": "RYY",
                     "RZZ": "RZZ", "RZX": "RZX", "DCX": "DCX", "ECR": "ECR",
                 }
 
-                if gate.name in _CONTROLLED_GATES:
-                    ctrl_sym, tgt_sym = _CONTROLLED_GATES[gate.name]
+                if gate.name in controlled_gates:
+                    ctrl_sym, tgt_sym = controlled_gates[gate.name]
                     width = max(len(ctrl_sym), len(tgt_sym))
                     for q in range(self._num_qubits):
                         if q == q0:
@@ -634,8 +634,8 @@ class Circuit:
                             lines[q].append("|".center(width))
                         else:
                             lines[q].append("─" * width)
-                elif gate.name in _SYMMETRIC_GATES:
-                    sym = _SYMMETRIC_GATES[gate.name]
+                elif gate.name in symmetric_gates:
+                    sym = symmetric_gates[gate.name]
                     for q in range(self._num_qubits):
                         if q in gate.qubits:
                             lines[q].append(sym)

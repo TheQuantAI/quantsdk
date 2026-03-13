@@ -14,7 +14,7 @@ Example::
 
     from quantsdk.cloud import CloudClient
 
-    client = CloudClient(api_key="qc_live_...")
+    client = CloudClient(api_key="YOUR_API_KEY")
     job = client.submit(circuit, shots=1000)
     result = client.get_result(job.job_id)
 """
@@ -26,7 +26,6 @@ import time
 from dataclasses import dataclass, field
 from enum import Enum
 from typing import Any
-from urllib.parse import urljoin
 
 logger = logging.getLogger(__name__)
 
@@ -178,7 +177,7 @@ class CloudClient:
         from quantsdk.cloud import CloudClient
 
         # Initialize with API key
-        client = CloudClient(api_key="qc_live_abc123")
+        client = CloudClient(api_key="YOUR_API_KEY")
 
         # Submit a circuit
         job = client.submit(circuit, shots=1000)
@@ -227,7 +226,7 @@ class CloudClient:
         # Try loading from ~/.quantcloud/credentials
         config_path = os.path.expanduser("~/.quantcloud/credentials")
         if os.path.exists(config_path):
-            with open(config_path, "r") as f:
+            with open(config_path) as f:
                 for line in f:
                     line = line.strip()
                     if line.startswith("api_key="):
@@ -248,10 +247,10 @@ class CloudClient:
         if self._session is None:
             try:
                 import httpx
-            except ImportError:
+            except ImportError as exc:
                 raise ImportError(
                     "Cloud client requires httpx. Install with: pip install httpx"
-                )
+                ) from exc
             self._session = httpx.Client(
                 base_url=self._api_base,
                 headers={
@@ -302,7 +301,8 @@ class CloudClient:
                 response=data,
             )
 
-        return response.json()
+        result: dict[str, Any] = response.json()
+        return result
 
     # ─── Circuit Operations ───
 

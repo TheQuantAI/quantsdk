@@ -258,9 +258,9 @@ def analyze_circuit(circuit: Any) -> CircuitFeatures:
     connectivity: set[tuple[int, int]] = set()
     cx_count = 0
 
-    _PARAM_GATES = {"RX", "RY", "RZ", "U1", "U2", "U3", "P", "R",
-                    "CRX", "CRY", "CRZ", "CP", "CU1", "CU3",
-                    "RXX", "RYY", "RZZ", "RZX"}
+    param_gates = {"RX", "RY", "RZ", "U1", "U2", "U3", "P", "R",
+                   "CRX", "CRY", "CRZ", "CP", "CU1", "CU3",
+                   "RXX", "RYY", "RZZ", "RZX"}
 
     for gate in gates:
         if gate.name == "MEASURE":
@@ -277,15 +277,14 @@ def analyze_circuit(circuit: Any) -> CircuitFeatures:
             q0, q1 = gate.qubits
             connectivity.add((min(q0, q1), max(q0, q1)))
             if gate.name in ("CX", "CY", "CZ", "CH", "SWAP", "iSWAP",
-                             "DCX", "ECR", "CS", "CSdg", "CSX"):
-                cx_count += 1
-            elif gate.name in ("CRX", "CRY", "CRZ", "CP", "CU1", "CU3",
-                               "RXX", "RYY", "RZZ", "RZX"):
+                             "DCX", "ECR", "CS", "CSdg", "CSX",
+                             "CRX", "CRY", "CRZ", "CP", "CU1", "CU3",
+                             "RXX", "RYY", "RZZ", "RZX"):
                 cx_count += 1
         elif nq == 3:
             three_q += 1
 
-        if gate.name in _PARAM_GATES:
+        if gate.name in param_gates:
             parameterized = True
 
     gate_types = frozenset(ops.keys())
@@ -521,20 +520,23 @@ class QuantRouter:
         for i, b in enumerate(self._backends):
             if b.name == name:
                 # Create a new BackendCapability with updated fields
-                current = {
-                    "name": b.name, "provider": b.provider,
-                    "num_qubits": b.num_qubits, "is_simulator": b.is_simulator,
-                    "native_gates": b.native_gates,
-                    "avg_single_qubit_fidelity": b.avg_single_qubit_fidelity,
-                    "avg_two_qubit_fidelity": b.avg_two_qubit_fidelity,
-                    "queue_depth": b.queue_depth,
-                    "avg_queue_time_sec": b.avg_queue_time_sec,
-                    "cost_per_shot": b.cost_per_shot,
-                    "max_shots": b.max_shots,
-                    "is_available": b.is_available,
-                }
+                from dataclasses import asdict
+                current = asdict(b)
                 current.update(updates)
-                self._backends[i] = BackendCapability(**current)
+                self._backends[i] = BackendCapability(
+                    name=str(current["name"]),
+                    provider=str(current["provider"]),
+                    num_qubits=int(current["num_qubits"]),
+                    is_simulator=bool(current["is_simulator"]),
+                    native_gates=frozenset(current["native_gates"]),
+                    avg_single_qubit_fidelity=float(current["avg_single_qubit_fidelity"]),
+                    avg_two_qubit_fidelity=float(current["avg_two_qubit_fidelity"]),
+                    queue_depth=int(current["queue_depth"]),
+                    avg_queue_time_sec=float(current["avg_queue_time_sec"]),
+                    cost_per_shot=float(current["cost_per_shot"]),
+                    max_shots=int(current["max_shots"]),
+                    is_available=bool(current["is_available"]),
+                )
                 return
         raise ValueError(f"Backend '{name}' not found in registry")
 
@@ -614,13 +616,12 @@ class QuantRouter:
 
     def _get_weights(self, optimize_for: str) -> dict[str, float]:
         """Get scoring weights based on optimization target."""
-        if optimize_for == "quality":
-            return _QUALITY_WEIGHTS
-        elif optimize_for == "speed":
-            return _SPEED_WEIGHTS
-        elif optimize_for == "cost":
-            return _COST_WEIGHTS
-        return self._weights
+        weights_map = {
+            "quality": _QUALITY_WEIGHTS,
+            "speed": _SPEED_WEIGHTS,
+            "cost": _COST_WEIGHTS,
+        }
+        return weights_map.get(optimize_for, self._weights)
 
     def _filter_backends(
         self,
@@ -653,9 +654,8 @@ class QuantRouter:
                     continue
 
             # Queue time filter
-            if constraints.max_queue_time_sec is not None:
-                if b.avg_queue_time_sec > constraints.max_queue_time_sec:
-                    continue
+            if constraints.max_queue_time_sec is not None and b.avg_queue_time_sec > constraints.max_queue_time_sec:
+                continue
 
             candidates.append(b)
 

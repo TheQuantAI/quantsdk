@@ -35,9 +35,9 @@ __all__ = [
     "Circuit",
     "Result",
     "__version__",
-    "run",
-    "router",
     "cloud",
+    "router",
+    "run",
 ]
 
 
