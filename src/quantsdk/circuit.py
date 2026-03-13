@@ -608,19 +608,53 @@ class Circuit:
             elif gate.num_qubits == 2:
                 q0, q1 = gate.qubits
                 min_q, max_q = min(q0, q1), max(q0, q1)
-                for q in range(self._num_qubits):
-                    if q == q0 and gate.name == "CX":
-                        lines[q].append("●")
-                    elif q == q1 and gate.name == "CX":
-                        lines[q].append("X")
-                    elif (q == q0 and gate.name == "CZ") or (q == q1 and gate.name == "CZ"):
-                        lines[q].append("●")
-                    elif gate.name == "SWAP" and q in gate.qubits:
-                        lines[q].append("x")
-                    elif min_q < q < max_q:
-                        lines[q].append("|")
-                    else:
-                        lines[q].append("─")
+
+                # Determine symbols for control and target qubit
+                _CONTROLLED_GATES = {
+                    "CX": ("●", "X"), "CY": ("●", "Y"), "CZ": ("●", "●"),
+                    "CH": ("●", "H"), "CS": ("●", "S"), "CSdg": ("●", "S†"),
+                    "CSX": ("●", "SX"), "CRX": ("●", "RX"), "CRY": ("●", "RY"),
+                    "CRZ": ("●", "RZ"), "CP": ("●", "P"), "CU1": ("●", "U1"),
+                    "CU3": ("●", "U3"),
+                }
+                _SYMMETRIC_GATES = {
+                    "SWAP": "x", "iSWAP": "iS", "RXX": "RXX", "RYY": "RYY",
+                    "RZZ": "RZZ", "RZX": "RZX", "DCX": "DCX", "ECR": "ECR",
+                }
+
+                if gate.name in _CONTROLLED_GATES:
+                    ctrl_sym, tgt_sym = _CONTROLLED_GATES[gate.name]
+                    width = max(len(ctrl_sym), len(tgt_sym))
+                    for q in range(self._num_qubits):
+                        if q == q0:
+                            lines[q].append(ctrl_sym.center(width))
+                        elif q == q1:
+                            lines[q].append(tgt_sym.center(width))
+                        elif min_q < q < max_q:
+                            lines[q].append("|".center(width))
+                        else:
+                            lines[q].append("─" * width)
+                elif gate.name in _SYMMETRIC_GATES:
+                    sym = _SYMMETRIC_GATES[gate.name]
+                    for q in range(self._num_qubits):
+                        if q in gate.qubits:
+                            lines[q].append(sym)
+                        elif min_q < q < max_q:
+                            lines[q].append("|".center(len(sym)))
+                        else:
+                            lines[q].append("─" * len(sym))
+                else:
+                    # Fallback for unknown 2-qubit gates
+                    label = gate.name
+                    for q in range(self._num_qubits):
+                        if q == q0:
+                            lines[q].append(f"{label}₀")
+                        elif q == q1:
+                            lines[q].append(f"{label}₁")
+                        elif min_q < q < max_q:
+                            lines[q].append("|".center(len(label) + 1))
+                        else:
+                            lines[q].append("─" * (len(label) + 1))
 
             elif gate.num_qubits == 3:
                 q0, q1, q2 = gate.qubits

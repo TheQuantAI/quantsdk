@@ -36,6 +36,8 @@ __all__ = [
     "Result",
     "__version__",
     "run",
+    "router",
+    "cloud",
 ]
 
 
@@ -49,4 +51,12 @@ def __getattr__(name: str) -> object:
         from quantsdk import backends
 
         return backends
+    if name == "router":
+        from quantsdk import router
+
+        return router
+    if name == "cloud":
+        from quantsdk import cloud
+
+        return cloud
     raise AttributeError(f"module 'quantsdk' has no attribute {name!r}")

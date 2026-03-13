@@ -747,11 +747,12 @@ class CCZGate(Gate):
 class Measure(Gate):
     """Measurement in the computational basis."""
 
+    classical_bit: int | None = None
+
     def __init__(self, qubit: int, classical_bit: int | None = None) -> None:
         object.__setattr__(self, "name", "MEASURE")
         object.__setattr__(self, "qubits", (qubit,))
         object.__setattr__(self, "params", ())
-        # Store classical bit mapping (not in params since it's not a float)
         object.__setattr__(self, "classical_bit", classical_bit)
 
     def matrix(self) -> np.ndarray:

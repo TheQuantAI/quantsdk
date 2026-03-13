@@ -131,11 +131,12 @@ class TestRunnerEnhanced:
         with pytest.raises(ValueError, match="Unknown backend"):
             qs.run(c, backend="fake_backend")
 
-    def test_run_smart_routing_raises(self):
-        """Smart routing is not yet implemented."""
+    def test_run_smart_routing_works(self):
+        """Smart routing via QuantRouter now works."""
         c = Circuit(1).h(0).measure_all()
-        with pytest.raises(NotImplementedError, match="QuantRouter"):
-            qs.run(c, optimize_for="quality")
+        result = qs.run(c, optimize_for="quality", shots=100)
+        assert result.shots == 100
+        assert result.counts  # Should have measurement results
 
 
 # ─── Result.plot_histogram() ───

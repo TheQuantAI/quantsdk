@@ -147,13 +147,14 @@ class TestRunAPI:
         with pytest.raises(ValueError, match="Unknown backend"):
             qs.run(c, backend="fake_nonexistent_backend")
 
-    def test_run_smart_routing_raises(self):
-        """optimize_for should raise NotImplementedError in v0.1."""
+    def test_run_smart_routing_works(self):
+        """optimize_for now uses QuantRouter for backend selection."""
         c = qs.Circuit(1)
         c.h(0).measure_all()
 
-        with pytest.raises(NotImplementedError, match="QuantRouter"):
-            qs.run(c, optimize_for="quality")
+        result = qs.run(c, optimize_for="quality", shots=100)
+        assert result.shots == 100
+        assert result.counts
 
 
 class TestResult:
