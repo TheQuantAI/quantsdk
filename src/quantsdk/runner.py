@@ -68,7 +68,7 @@ def run(
             - ``"ibm_<name>"`` — IBM Quantum hardware (requires token + qiskit-ibm-runtime)
 
         optimize_for: Optimization target — "quality", "speed", or "cost".
-                      Enables QuantRouter smart routing (coming in v0.2).
+                      Enables QuantRouter smart routing.
         max_cost_usd: Maximum cost in USD (cloud only).
         min_fidelity: Minimum acceptable fidelity (cloud only).
         seed: Random seed for reproducible results (simulator only).
@@ -96,14 +96,23 @@ def run(
         # Run on IBM Quantum hardware
         result = qs.run(circuit, backend="ibm_brisbane", shots=4096)
 
-        # Smart routing (coming in v0.2)
-        # result = qs.run(circuit, optimize_for="quality", shots=1000)
+        # Smart routing via QuantRouter
+        result = qs.run(circuit, optimize_for="quality", shots=1000)
     """
     if optimize_for is not None:
-        raise NotImplementedError(
-            "Smart routing (optimize_for) requires QuantRouter. "
-            "Coming in v0.2. For now, specify a backend explicitly."
+        from quantsdk.router import QuantRouter, RoutingConstraints
+
+        router = QuantRouter()
+        constraints = RoutingConstraints(
+            optimize_for=optimize_for,
+            max_cost_usd=max_cost_usd,
+            min_fidelity=min_fidelity,
         )
+        decision = router.route(circuit, constraints=constraints)
+        logger.info("QuantRouter selected '%s': %s", decision.backend, decision.reason)
+
+        # Re-invoke run() with the selected backend (no optimize_for to avoid recursion)
+        return run(circuit, shots=shots, backend=decision.backend, seed=seed, **options)
 
     # Resolve backend name
     resolved = _BACKEND_ALIASES.get(backend or "local_simulator", backend or "local_simulator")
