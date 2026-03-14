@@ -16,7 +16,7 @@
   <a href="https://docs.thequantcloud.com/getting-started/">Getting Started</a> |
   <a href="https://docs.thequantcloud.com/api/">API Reference</a> |
   <a href="#-examples">Examples</a> |
-  <a href="https://discord.gg/thequantai">Discord</a>
+  <a href="https://discord.gg/uTEW77Kcj4">Discord</a>
 </p>
 
 ---
