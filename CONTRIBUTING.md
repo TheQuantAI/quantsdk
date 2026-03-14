@@ -212,7 +212,7 @@ If you discover a security vulnerability, please **do not** open a public issue.
 
 - **GitHub Issues** — Bug reports and feature requests
 - **GitHub Discussions** — Questions and general discussion
-- **Discord** — Real-time chat with the team and community
+- **Discord** — [Join our Discord](https://discord.gg/uTEW77Kcj4) for real-time chat with the team and community
 
 ## License
 
