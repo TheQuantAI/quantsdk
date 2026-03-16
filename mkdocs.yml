@@ -129,6 +129,7 @@ nav:
     - Quick Start: getting-started/quickstart.md
     - Your First Circuit: getting-started/first-circuit.md
     - Running on Real Hardware: getting-started/real-hardware.md
+    - Cloud Quick Start: getting-started/cloud-quickstart.md
   - API Reference:
     - api/index.md
     - Circuit: api/circuit.md
@@ -136,6 +137,7 @@ nav:
     - Result: api/result.md
     - Backend: api/backend.md
     - Framework Interop: api/interop.md
+    - Cloud API: api/cloud-api.md
   - Tutorials:
     - tutorials/index.md
     - "01 - Bell State & Entanglement": tutorials/01-bell-state.md
