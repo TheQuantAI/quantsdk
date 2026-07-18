@@ -138,6 +138,7 @@ nav:
     - Backend: api/backend.md
     - Framework Interop: api/interop.md
     - Cloud API: api/cloud-api.md
+    - Circuit Analysis: api/router.md
   - Tutorials:
     - tutorials/index.md
     - "01 - Bell State & Entanglement": tutorials/01-bell-state.md

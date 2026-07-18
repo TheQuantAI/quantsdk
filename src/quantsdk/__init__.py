@@ -29,12 +29,15 @@ except PackageNotFoundError:  # pragma: no cover — editable / dev installs
 
 from quantsdk.circuit import Circuit
 from quantsdk.result import Result
+from quantsdk.router import CircuitFeatures, analyze_circuit
 from quantsdk.runner import run
 
 __all__ = [
     "Circuit",
+    "CircuitFeatures",
     "Result",
     "__version__",
+    "analyze_circuit",
     "cloud",
     "router",
     "run",
