@@ -25,7 +25,7 @@ from importlib.metadata import version as _version
 try:
     __version__ = _version("quantsdk")
 except PackageNotFoundError:  # pragma: no cover — editable / dev installs
-    __version__ = "0.1.0"
+    __version__ = "0.2.0"
 
 from quantsdk.circuit import Circuit
 from quantsdk.result import Result
