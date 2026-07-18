@@ -5,7 +5,9 @@ All notable changes to QuantSDK will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased] — v0.1.0-dev
+## [Unreleased]
+
+## [0.2.0] — 2026-07-18
 
 ### Added
 
@@ -14,6 +16,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `from quantsdk import analyze_circuit, CircuitFeatures`. Extracts routing/telemetry
   features (qubit/gate counts, depth, cx count, connectivity, algorithm class).
   Still available as `qs.router.analyze_circuit`.
+
+### Fixed
+- CI type-checking (mypy): skip numpy's PEP 695 stubs under `python_version = "3.10"`,
+  and tolerate `type: ignore` comments that are only needed when optional deps
+  (qiskit) are installed — repairs the `Type Check` job for all SDK PRs.
+
+## [0.1.0] — 2026-03-14
+
+### Added
 
 #### Core
 - `Circuit` class with fluent API for building quantum circuits
