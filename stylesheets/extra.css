@@ -1,0 +1,27 @@
+/* QuantSDK Docs — custom styles */
+
+:root {
+  --md-primary-fg-color: #6200ea;
+  --md-accent-fg-color: #ffc400;
+}
+
+/* Hero section on landing page */
+.md-typeset .hero {
+  text-align: center;
+  padding: 2rem 0;
+}
+.md-typeset .hero h1 {
+  font-size: 2.5rem;
+  font-weight: 700;
+}
+
+/* Gate reference table */
+.md-typeset table.gate-table td:first-child {
+  font-family: var(--md-code-font-family);
+  font-weight: 600;
+}
+
+/* Code block improvements */
+.md-typeset pre > code {
+  font-size: 0.82rem;
+}
