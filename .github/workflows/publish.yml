@@ -209,7 +209,7 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           RELEASE_TAG: ${{ github.event.release.tag_name }}
         run: |
-          gh release upload "$RELEASE_TAG" dist/SHA256SUMS.txt --clobber
+          gh release upload "$RELEASE_TAG" dist/SHA256SUMS.txt --clobber --repo "$GITHUB_REPOSITORY"
         shell: bash
 
   # ── 6. Publish to TestPyPI (workflow_dispatch only) ───────────────────────
