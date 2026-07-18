@@ -23,7 +23,8 @@ from importlib.metadata import PackageNotFoundError
 from importlib.metadata import version as _version
 
 try:
-    __version__ = _version("quantsdk")
+    # Distribution name is "thequantsdk" (import package is "quantsdk").
+    __version__ = _version("thequantsdk")
 except PackageNotFoundError:  # pragma: no cover — editable / dev installs
     __version__ = "0.2.0"
 
