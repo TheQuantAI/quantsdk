@@ -5,6 +5,7 @@
 
 from __future__ import annotations
 
+import importlib.util
 import math
 
 import pytest
@@ -12,11 +13,12 @@ import pytest
 import quantsdk as qs
 from quantsdk.circuit import Circuit
 
+_HAS_QISKIT = importlib.util.find_spec("qiskit") is not None
+
 # ─── Circuit.to_qiskit() / from_qiskit() convenience methods ───
 
-qiskit = pytest.importorskip("qiskit", reason="Qiskit not installed")
 
-
+@pytest.mark.skipif(not _HAS_QISKIT, reason="Qiskit not installed")
 class TestCircuitConvenienceMethods:
     """Test to_qiskit(), to_openqasm(), from_qiskit(), from_openqasm() on Circuit."""
 
@@ -224,3 +226,32 @@ class TestResultToPandas:
 
         df = result.to_pandas()
         assert len(df) == len(result.counts)
+
+
+# ─── Public analyze_circuit / CircuitFeatures surface (SDK-010) ───
+
+
+class TestPublicAnalyzeCircuit:
+    """`analyze_circuit` and `CircuitFeatures` are supported top-level public API."""
+
+    def test_top_level_import(self):
+        """Both are importable from the package root and listed in __all__."""
+        from quantsdk import CircuitFeatures, analyze_circuit  # noqa: F401
+
+        assert "analyze_circuit" in qs.__all__
+        assert "CircuitFeatures" in qs.__all__
+
+    def test_returns_circuit_features(self):
+        """analyze_circuit returns a CircuitFeatures with the expected metrics."""
+        feats = qs.analyze_circuit(Circuit(2).h(0).cx(0, 1).measure_all())
+
+        assert isinstance(feats, qs.CircuitFeatures)
+        assert feats.qubit_count == 2
+        assert feats.cx_count == 1
+
+    def test_router_submodule_path_still_works(self):
+        """Backward compatibility: qs.router.analyze_circuit is the same object."""
+        from quantsdk import router
+
+        assert router.analyze_circuit is qs.analyze_circuit
+        assert router.CircuitFeatures is qs.CircuitFeatures

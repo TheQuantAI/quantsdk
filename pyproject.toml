@@ -129,6 +129,18 @@ python_version = "3.10"
 strict = true
 warn_return_any = true
 warn_unused_configs = true
+# Optional heavy deps (qiskit, etc.) mean some `type: ignore` comments are needed
+# only when those deps are installed; the CI Type Check job runs without them, so
+# don't fail on ignores that are unused in a given environment (SDK-010 CI repair).
+warn_unused_ignores = false
+
+# Newer numpy ships PEP 695 (`type` statement, 3.12+) in its stubs, which mypy
+# cannot parse under python_version 3.10. Skip following numpy's stubs so our
+# own code is still checked against 3.10 (SDK-010).
+[[tool.mypy.overrides]]
+module = "numpy.*"
+follow_imports = "skip"
+follow_imports_for_stubs = true
 
 [tool.bandit]
 exclude_dirs = ["tests", "examples"]

@@ -9,6 +9,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+#### Circuit Analysis
+- `analyze_circuit(circuit)` and its `CircuitFeatures` result are now public API:
+  `from quantsdk import analyze_circuit, CircuitFeatures`. Extracts routing/telemetry
+  features (qubit/gate counts, depth, cx count, connectivity, algorithm class).
+  Still available as `qs.router.analyze_circuit`.
+
 #### Core
 - `Circuit` class with fluent API for building quantum circuits
 - Named circuits via `qs.Circuit(n, name="my_circuit")`
